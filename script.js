@@ -1,52 +1,65 @@
-let totalAmount = 0;
-let expenses = 0;
+let totalCollected = parseFloat(localStorage.getItem('totalCollected')) || 0;
+let totalExpenses = parseFloat(localStorage.getItem('totalExpenses')) || 0;
+const savedRecords = JSON.parse(localStorage.getItem('records')) || [];
 
-// Update UI
-function updateUI() {
-  document.getElementById("total-amount").textContent = totalAmount.toFixed(2);
-  document.getElementById("remaining-balance").textContent = (totalAmount - expenses).toFixed(2);
-}
+document.getElementById("totalCollected").innerText = `£${totalCollected}`;
+document.getElementById("remainingBalance").innerText = `£${totalCollected - totalExpenses}`;
+
+// Display saved records from localStorage
+const recordsContainer = document.getElementById("records");
+savedRecords.forEach(record => {
+    const recordElement = document.createElement("div");
+    recordElement.textContent = record;
+    recordsContainer.appendChild(recordElement);
+});
 
 // Add Contribution
-document.getElementById("add-contribution").addEventListener("click", () => {
-  const name = document.getElementById("contributor-name").value.trim();
-  const amount = parseFloat(document.getElementById("amount-contributed").value);
+document.getElementById("addContribution").addEventListener("click", function () {
+    const name = document.getElementById("contributorName").value;
+    const amount = parseFloat(document.getElementById("contributionAmount").value);
 
-  if (name && amount && amount > 0) {
-    totalAmount += amount;
-    updateUI();
+    if (name && !isNaN(amount) && amount > 0) {
+        totalCollected += amount;
+        document.getElementById("totalCollected").innerText = `£${totalCollected}`;
 
-    const record = `${name} contributed $${amount.toFixed(2)}`;
-    addRecord(record);
-    document.getElementById("contributor-name").value = "";
-    document.getElementById("amount-contributed").value = "";
-  } else {
-    alert("Please enter a valid name and amount!");
-  }
+        const record = `${name} contributed £${amount}`;
+        const recordElement = document.createElement("div");
+        recordElement.textContent = record;
+        recordsContainer.appendChild(recordElement);
+
+        // Save the data to localStorage
+        localStorage.setItem('totalCollected', totalCollected);
+        savedRecords.push(record);
+        localStorage.setItem('records', JSON.stringify(savedRecords));
+    }
+
+    // Clear input fields after adding the contribution
+    document.getElementById("contributorName").value = "";
+    document.getElementById("contributionAmount").value = "";
 });
 
 // Add Expense
-document.getElementById("add-expense").addEventListener("click", () => {
-  const description = document.getElementById("expense-description").value.trim();
-  const amount = parseFloat(document.getElementById("expense-amount").value);
+document.getElementById("addExpense").addEventListener("click", function () {
+    const description = document.getElementById("expenseDescription").value;
+    const amount = parseFloat(document.getElementById("expenseAmount").value);
 
-  if (description && amount && amount > 0) {
-    expenses += amount;
-    updateUI();
+    if (description && !isNaN(amount) && amount > 0) {
+        totalExpenses += amount;
+        const remainingBalance = totalCollected - totalExpenses;
+        document.getElementById("remainingBalance").innerText = `£${remainingBalance}`;
 
-    const record = `Expense: ${description} - $${amount.toFixed(2)}`;
-    addRecord(record);
-    document.getElementById("expense-description").value = "";
-    document.getElementById("expense-amount").value = "";
-  } else {
-    alert("Please enter a valid description and amount!");
-  }
+        const record = `Expense: ${description} (£${amount})`;
+        const recordElement = document.createElement("div");
+        recordElement.textContent = record;
+        recordsContainer.appendChild(recordElement);
+
+        // Save the data to localStorage
+        localStorage.setItem('totalExpenses', totalExpenses);
+        savedRecords.push(record);
+        localStorage.setItem('records', JSON.stringify(savedRecords));
+    }
+
+    // Clear input fields after adding the expense
+    document.getElementById("expenseDescription").value = "";
+    document.getElementById("expenseAmount").value = "";
 });
-
-// Add Record to List
-function addRecord(record) {
-  const list = document.getElementById("records-list");
-  const listItem = document.createElement("li");
-  listItem.textContent = record;
-  list.appendChild(listItem);
-}
