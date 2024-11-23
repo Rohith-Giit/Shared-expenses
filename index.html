@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shared Expenses Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <h1>Shared Expenses Tracker</h1>
+    <div id="total-section">
+      <h2>Total Amount Collected: $<span id="total-amount">0</span></h2>
+      <h2>Remaining Balance: $<span id="remaining-balance">0</span></h2>
+    </div>
+    <div id="form-section">
+      <h3>Add Contribution</h3>
+      <input type="text" id="contributor-name" placeholder="Name">
+      <input type="number" id="amount-contributed" placeholder="Amount">
+      <button id="add-contribution">Add Contribution</button>
+    </div>
+    <div id="expenses-section">
+      <h3>Add Expense</h3>
+      <input type="text" id="expense-description" placeholder="Description">
+      <input type="number" id="expense-amount" placeholder="Amount">
+      <button id="add-expense">Add Expense</button>
+    </div>
+    <div id="records">
+      <h3>Records</h3>
+      <ul id="records-list"></ul>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
