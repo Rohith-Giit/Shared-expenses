@@ -3,45 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Budget Tracker</title>
+    <title>Shared Expenses Tracker</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK Placeholder -->
+    <!-- Add Firebase later -->
 </head>
 <body>
-    <div id="container">
-        <h1>Budget Tracker</h1>
+    <header>
+        <h1>🏠 Shared Expenses Tracker</h1>
+        <p>Manage contributions and expenses with ease!</p>
+    </header>
 
-        <!-- Total Collected and Remaining Balance -->
-        <div class="totals">
-            <div>
-                <label for="totalCollectedInput">Total Collected: </label>
-                <input id="totalCollectedInput" type="number" step="0.01" placeholder="Total collected" />
+    <main>
+        <!-- Add Contribution Section -->
+        <section id="contribution-section">
+            <h2>Add Contribution</h2>
+            <div class="form-group">
+                <input type="text" id="contributorName" placeholder="Contributor's Name" required>
+                <input type="number" id="contributionAmount" placeholder="Amount (£)" required>
+                <button id="addContribution" class="btn">Add Contribution</button>
             </div>
-            <div>
-                <label for="remainingBalanceInput">Remaining Balance: </label>
-                <input id="remainingBalanceInput" type="number" step="0.01" placeholder="Remaining balance" />
+        </section>
+
+        <!-- Add Expense Section -->
+        <section id="expense-section">
+            <h2>Add Expense</h2>
+            <div class="form-group">
+                <input type="text" id="spenderName" placeholder="Who Paid?" required>
+                <input type="text" id="expenseDescription" placeholder="Expense Description" required>
+                <input type="number" id="expenseAmount" placeholder="Amount (£)" required>
+                <button id="addExpense" class="btn">Add Expense</button>
             </div>
-        </div>
+        </section>
 
-        <!-- Contribution Form -->
-        <div class="form">
-            <h3>Add Contribution</h3>
-            <input type="text" id="contributorName" placeholder="Contributor's Name" />
-            <input type="number" id="contributionAmount" placeholder="Amount (£)" />
-            <button id="addContribution">Add Contribution</button>
-        </div>
+        <!-- Records -->
+        <section id="records-section">
+            <h2>Records</h2>
+            <div id="records">
+                <h3>Contributions</h3>
+                <ul id="contributionRecords"></ul>
+                <h3>Expenses</h3>
+                <ul id="expenseRecords"></ul>
+            </div>
+        </section>
 
-        <!-- Expense Form -->
-        <div class="form">
-            <h3>Add Expense</h3>
-            <input type="text" id="expenseDescription" placeholder="Expense Description" />
-            <input type="number" id="expenseAmount" placeholder="Amount (£)" />
-            <button id="addExpense">Add Expense</button>
-        </div>
+        <!-- Totals -->
+        <section id="totals-section">
+            <h2>Totals</h2>
+            <p>Total Collected: £<span id="totalCollected">0</span></p>
+            <p>Remaining Balance: £<span id="remainingBalance">0</span></p>
+        </section>
+    </main>
 
-        <!-- Display records -->
-        <h3>Records</h3>
-        <div id="recordsContainer"></div>
-    </div>
+    <footer>
+        <p>© 2024 Shared Expenses Tracker</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>

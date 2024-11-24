@@ -1,132 +1,98 @@
-// Initialize variables from localStorage
-let totalCollected = parseFloat(localStorage.getItem('totalCollected')) || 0;
-let totalExpenses = parseFloat(localStorage.getItem('totalExpenses')) || 0;
-const savedRecords = JSON.parse(localStorage.getItem('records')) || [];
+// Data Storage
+let contributions = [];
+let expenses = [];
+let totalCollected = 0;
+let totalExpenses = 0;
 
-// Update the total values on page load
-document.getElementById('totalCollectedInput').value = totalCollected;
-document.getElementById('remainingBalanceInput').value = totalCollected - totalExpenses;
+// Update Totals
+function updateTotals() {
+    const remainingBalance = totalCollected - totalExpenses;
+    document.getElementById("totalCollected").innerText = totalCollected.toFixed(2);
+    document.getElementById("remainingBalance").innerText = remainingBalance.toFixed(2);
+}
 
-const recordsContainer = document.getElementById('recordsContainer');
+// Render Records
+function renderRecords() {
+    const contributionList = document.getElementById("contributionRecords");
+    const expenseList = document.getElementById("expenseRecords");
 
-// Load saved records
-savedRecords.forEach((record, index) => {
-    const recordDiv = document.createElement('div');
-    recordDiv.classList.add('records');
-    recordDiv.innerHTML = `
-        <span>${record}</span>
-        <button onclick="editRecord(${index})">Edit</button>
-        <button onclick="deleteRecord(${index})">Delete</button>
-    `;
-    recordsContainer.appendChild(recordDiv);
-});
+    // Clear existing records
+    contributionList.innerHTML = "";
+    expenseList.innerHTML = "";
 
-// Add Contribution
-document.getElementById('addContribution').addEventListener('click', () => {
-    const name = document.getElementById('contributorName').value;
-    const amount = parseFloat(document.getElementById('contributionAmount').value);
-
-    if (name && !isNaN(amount) && amount > 0) {
-        totalCollected += amount;
-        localStorage.setItem('totalCollected', totalCollected);
-
-        const record = `${name} contributed £${amount}`;
-        savedRecords.push(record);
-        localStorage.setItem('records', JSON.stringify(savedRecords));
-
-        updateRecords();
-    }
-
-    document.getElementById('contributorName').value = '';
-    document.getElementById('contributionAmount').value = '';
-});
-
-// Add Expense
-document.getElementById('addExpense').addEventListener('click', () => {
-    const description = document.getElementById('expenseDescription').value;
-    const amount = parseFloat(document.getElementById('expenseAmount').value);
-
-    if (description && !isNaN(amount) && amount > 0) {
-        totalExpenses += amount;
-        localStorage.setItem('totalExpenses', totalExpenses);
-
-        const record = `Expense: ${description} (£${amount})`;
-        savedRecords.push(record);
-        localStorage.setItem('records', JSON.stringify(savedRecords));
-
-        updateRecords();
-    }
-
-    document.getElementById('expenseDescription').value = '';
-    document.getElementById('expenseAmount').value = '';
-});
-
-// Update displayed records and totals
-function updateRecords() {
-    recordsContainer.innerHTML = '';
-    savedRecords.forEach((record, index) => {
-        const recordDiv = document.createElement('div');
-        recordDiv.classList.add('records');
-        recordDiv.innerHTML = `
-            <span>${record}</span>
-            <button onclick="editRecord(${index})">Edit</button>
-            <button onclick="deleteRecord(${index})">Delete</button>
+    // Render contributions
+    contributions.forEach((contribution, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            ${contribution.name} contributed £${contribution.amount.toFixed(2)}
+            <button onclick="deleteContribution(${index})">Delete</button>
         `;
-        recordsContainer.appendChild(recordDiv);
+        contributionList.appendChild(li);
+    });
 
-        document.getElementById('totalCollectedInput').value = `£${totalCollected}`;
-        document.getElementById('remainingBalanceInput').value = `£${totalCollected - totalExpenses}`;
+    // Render expenses
+    expenses.forEach((expense, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            ${expense.name} spent £${expense.amount.toFixed(2)} on ${expense.description}
+            <button onclick="deleteExpense(${index})">Delete</button>
+        `;
+        expenseList.appendChild(li);
     });
 }
 
-// Edit Record
-function editRecord(index) {
-    const record = savedRecords[index];
-    const newValue = prompt('Edit value:', record);
-
-    if (newValue !== null) {
-        savedRecords[index] = newValue;
-        localStorage.setItem('records', JSON.stringify(savedRecords));
-        updateRecords();
-    }
+// Delete Contribution
+function deleteContribution(index) {
+    totalCollected -= contributions[index].amount;
+    contributions.splice(index, 1);
+    renderRecords();
+    updateTotals();
 }
 
-// Delete Record
-function deleteRecord(index) {
-    const record = savedRecords[index];
-
-    // Update totals
-    if (record.includes('contributed')) {
-        const amount = parseFloat(record.split('£')[1]);
-        totalCollected -= amount;
-        localStorage.setItem('totalCollected', totalCollected);
-    } else if (record.includes('Expense')) {
-        const amount = parseFloat(record.split('£')[1]);
-        totalExpenses -= amount;
-        localStorage.setItem('totalExpenses', totalExpenses);
-    }
-
-    savedRecords.splice(index, 1);
-    localStorage.setItem('records', JSON.stringify(savedRecords));
-    updateRecords();
+// Delete Expense
+function deleteExpense(index) {
+    totalExpenses -= expenses[index].amount;
+    expenses.splice(index, 1);
+    renderRecords();
+    updateTotals();
 }
 
-// Edit Total Collected and Remaining Balance
-document.getElementById('totalCollectedInput').addEventListener('blur', () => {
-    const newTotal = parseFloat(document.getElementById('totalCollectedInput').value);
-    if (!isNaN(newTotal)) {
-        totalCollected = newTotal;
-        localStorage.setItem('totalCollected', totalCollected);
-        updateRecords();
+// Add Contribution
+document.getElementById("addContribution").addEventListener("click", () => {
+    const name = document.getElementById("contributorName").value;
+    const amount = parseFloat(document.getElementById("contributionAmount").value);
+
+    if (name && !isNaN(amount) && amount > 0) {
+        contributions.push({ name, amount });
+        totalCollected += amount;
+
+        renderRecords();
+        updateTotals();
+
+        document.getElementById("contributorName").value = "";
+        document.getElementById("contributionAmount").value = "";
+    } else {
+        alert("Please enter valid contribution details!");
     }
 });
 
-document.getElementById('remainingBalanceInput').addEventListener('blur', () => {
-    const newRemaining = parseFloat(document.getElementById('remainingBalanceInput').value);
-    if (!isNaN(newRemaining)) {
-        const newTotal = totalCollected - newRemaining;
-        totalExpenses = newTotal;
-        localStorage.setItem('totalExpenses', totalExpenses);
-        updateRecords();
+// Add Expense
+document.getElementById("addExpense").addEventListener("click", () => {
+    const name = document.getElementById("spenderName").value;
+    const description = document.getElementById("expenseDescription").value;
+    const amount = parseFloat(document.getElementById("expenseAmount").value);
+
+    if (name && description && !isNaN(amount) && amount > 0) {
+        expenses.push({ name, description, amount });
+        totalExpenses += amount;
+
+        renderRecords();
+        updateTotals();
+
+        document.getElementById("spenderName").value = "";
+        document.getElementById("expenseDescription").value = "";
+        document.getElementById("expenseAmount").value = "";
+    } else {
+        alert("Please enter valid expense details!");
     }
 });
