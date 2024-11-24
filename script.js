@@ -1,60 +1,46 @@
-// Data Storage
+// Initialize Variables
 let contributions = [];
 let expenses = [];
 let totalCollected = 0;
 let totalExpenses = 0;
 
-// Update Totals
-function updateTotals() {
-    const remainingBalance = totalCollected - totalExpenses;
-    document.getElementById("totalCollected").innerText = totalCollected.toFixed(2);
-    document.getElementById("remainingBalance").innerText = remainingBalance.toFixed(2);
-}
+// Utility to Update UI
+function updateUI() {
+    const contributionRecords = document.getElementById("contributionRecords");
+    const expenseRecords = document.getElementById("expenseRecords");
+    const totalCollectedEl = document.getElementById("totalCollected");
+    const remainingBalanceEl = document.getElementById("remainingBalance");
 
-// Render Records
-function renderRecords() {
-    const contributionList = document.getElementById("contributionRecords");
-    const expenseList = document.getElementById("expenseRecords");
+    // Clear previous records
+    contributionRecords.innerHTML = "";
+    expenseRecords.innerHTML = "";
 
-    // Clear existing records
-    contributionList.innerHTML = "";
-    expenseList.innerHTML = "";
-
-    // Render contributions
+    // Render Contributions
     contributions.forEach((contribution, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-            ${contribution.name} contributed £${contribution.amount.toFixed(2)}
+        const div = document.createElement("div");
+        div.className = "record";
+        div.innerHTML = `
+            ${contribution.name} contributed £${contribution.amount}
             <button onclick="deleteContribution(${index})">Delete</button>
         `;
-        contributionList.appendChild(li);
+        contributionRecords.appendChild(div);
     });
 
-    // Render expenses
+    // Render Expenses
     expenses.forEach((expense, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-            ${expense.name} spent £${expense.amount.toFixed(2)} on ${expense.description}
+        const div = document.createElement("div");
+        div.className = "record";
+        div.innerHTML = `
+            ${expense.person} added: ${expense.description} (£${expense.amount})
+            ${expense.image ? `<img src="${expense.image}" alt="Receipt">` : ""}
             <button onclick="deleteExpense(${index})">Delete</button>
         `;
-        expenseList.appendChild(li);
+        expenseRecords.appendChild(div);
     });
-}
 
-// Delete Contribution
-function deleteContribution(index) {
-    totalCollected -= contributions[index].amount;
-    contributions.splice(index, 1);
-    renderRecords();
-    updateTotals();
-}
-
-// Delete Expense
-function deleteExpense(index) {
-    totalExpenses -= expenses[index].amount;
-    expenses.splice(index, 1);
-    renderRecords();
-    updateTotals();
+    // Update Summary
+    totalCollectedEl.innerText = totalCollected;
+    remainingBalanceEl.innerText = totalCollected - totalExpenses;
 }
 
 // Add Contribution
@@ -62,37 +48,63 @@ document.getElementById("addContribution").addEventListener("click", () => {
     const name = document.getElementById("contributorName").value;
     const amount = parseFloat(document.getElementById("contributionAmount").value);
 
-    if (name && !isNaN(amount) && amount > 0) {
+    if (name && amount > 0) {
         contributions.push({ name, amount });
         totalCollected += amount;
+        updateUI();
 
-        renderRecords();
-        updateTotals();
-
+        // Clear inputs
         document.getElementById("contributorName").value = "";
         document.getElementById("contributionAmount").value = "";
-    } else {
-        alert("Please enter valid contribution details!");
     }
 });
 
 // Add Expense
 document.getElementById("addExpense").addEventListener("click", () => {
-    const name = document.getElementById("spenderName").value;
+    const person = document.getElementById("expensePerson").value;
     const description = document.getElementById("expenseDescription").value;
     const amount = parseFloat(document.getElementById("expenseAmount").value);
+    const image = document.getElementById("expenseImage").files[0];
 
-    if (name && description && !isNaN(amount) && amount > 0) {
-        expenses.push({ name, description, amount });
-        totalExpenses += amount;
+    if (person && description && amount > 0) {
+        let imageURL = "";
 
-        renderRecords();
-        updateTotals();
+        if (image) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                imageURL = reader.result;
+                expenses.push({ person, description, amount, image: imageURL });
+                totalExpenses += amount;
+                updateUI();
+            };
+            reader.readAsDataURL(image);
+        } else {
+            expenses.push({ person, description, amount, image: "" });
+            totalExpenses += amount;
+            updateUI();
+        }
 
-        document.getElementById("spenderName").value = "";
+        // Clear inputs
+        document.getElementById("expensePerson").value = "";
         document.getElementById("expenseDescription").value = "";
         document.getElementById("expenseAmount").value = "";
-    } else {
-        alert("Please enter valid expense details!");
+        document.getElementById("expenseImage").value = "";
     }
 });
+
+// Delete Contribution
+function deleteContribution(index) {
+    totalCollected -= contributions[index].amount;
+    contributions.splice(index, 1);
+    updateUI();
+}
+
+// Delete Expense
+function deleteExpense(index) {
+    totalExpenses -= expenses[index].amount;
+    expenses.splice(index, 1);
+    updateUI();
+}
+
+// Initial UI Update
+updateUI();

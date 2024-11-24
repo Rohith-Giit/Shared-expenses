@@ -3,61 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shared Expenses Tracker</title>
+    <title>Room Expense Tracker</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Firebase SDK Placeholder -->
-    <!-- Add Firebase later -->
 </head>
 <body>
-    <header>
-        <h1>🏠 Shared Expenses Tracker</h1>
-        <p>Manage contributions and expenses with ease!</p>
-    </header>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2>Fixed Monthly Expenses</h2>
+            <ul>
+                <li>🏠 Rent: £500 (Paid on 1st of every month)</li>
+                <li>🌐 Broadband (EE): £30</li>
+                <li>⚡ Rebel Energy (Electricity & Gas): £233</li>
+            </ul>
+        </aside>
 
-    <main>
-        <!-- Add Contribution Section -->
-        <section id="contribution-section">
-            <h2>Add Contribution</h2>
-            <div class="form-group">
-                <input type="text" id="contributorName" placeholder="Contributor's Name" required>
-                <input type="number" id="contributionAmount" placeholder="Amount (£)" required>
-                <button id="addContribution" class="btn">Add Contribution</button>
-            </div>
-        </section>
+        <!-- Main Content -->
+        <main>
+            <h1>Shared Accommodation Finance</h1>
 
-        <!-- Add Expense Section -->
-        <section id="expense-section">
-            <h2>Add Expense</h2>
-            <div class="form-group">
-                <input type="text" id="spenderName" placeholder="Who Paid?" required>
-                <input type="text" id="expenseDescription" placeholder="Expense Description" required>
-                <input type="number" id="expenseAmount" placeholder="Amount (£)" required>
-                <button id="addExpense" class="btn">Add Expense</button>
-            </div>
-        </section>
+            <!-- Contribution Section -->
+            <section>
+                <h2>Add Contribution</h2>
+                <input type="text" id="contributorName" placeholder="Contributor's Name" />
+                <input type="number" id="contributionAmount" placeholder="Amount (£)" />
+                <button id="addContribution">Add Contribution</button>
+            </section>
 
-        <!-- Records -->
-        <section id="records-section">
-            <h2>Records</h2>
-            <div id="records">
+            <!-- Expense Section -->
+            <section>
+                <h2>Add Expense</h2>
+                <input type="text" id="expensePerson" placeholder="Person Adding Expense" />
+                <input type="text" id="expenseDescription" placeholder="Expense Description" />
+                <input type="number" id="expenseAmount" placeholder="Amount (£)" />
+                <input type="file" id="expenseImage" accept="image/*" />
+                <button id="addExpense">Add Expense</button>
+            </section>
+
+            <!-- Summary Section -->
+            <section>
+                <h2>Summary</h2>
+                <p><b>Total Collected:</b> £<span id="totalCollected">0</span></p>
+                <p><b>Remaining Balance:</b> £<span id="remainingBalance">0</span></p>
+            </section>
+
+            <!-- Records Section -->
+            <section>
+                <h2>Records</h2>
                 <h3>Contributions</h3>
-                <ul id="contributionRecords"></ul>
+                <div id="contributionRecords"></div>
+
                 <h3>Expenses</h3>
-                <ul id="expenseRecords"></ul>
-            </div>
-        </section>
-
-        <!-- Totals -->
-        <section id="totals-section">
-            <h2>Totals</h2>
-            <p>Total Collected: £<span id="totalCollected">0</span></p>
-            <p>Remaining Balance: £<span id="remainingBalance">0</span></p>
-        </section>
-    </main>
-
-    <footer>
-        <p>© 2024 Shared Expenses Tracker</p>
-    </footer>
+                <div id="expenseRecords"></div>
+            </section>
+        </main>
+    </div>
 
     <script src="script.js"></script>
 </body>
