@@ -1,0 +1,78 @@
+// DOM Elements
+const form = document.getElementById('trackerForm');
+const entriesList = document.getElementById('entriesList');
+const totalCollectedEl = document.getElementById('totalCollected');
+const totalExpensesEl = document.getElementById('totalExpenses');
+const remainingBalanceEl = document.getElementById('remainingBalance');
+
+// Track Totals
+let totalCollected = 0;
+let totalExpenses = 0;
+
+// Form Submit Event
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    // Input Values
+    const name = document.getElementById('name').value.trim();
+    const amount = parseFloat(document.getElementById('amount').value);
+    const type = document.getElementById('type').value;
+
+    if (!name || isNaN(amount)) {
+        alert('Please enter valid inputs.');
+        return;
+    }
+
+    // Add Entry
+    addEntry(name, amount, type);
+
+    // Update Totals
+    if (type === 'Contribution') {
+        totalCollected += amount;
+    } else if (type === 'Expense') {
+        totalExpenses += amount;
+    }
+
+    updateSummary();
+
+    // Clear Form
+    form.reset();
+});
+
+// Add Entry to List
+function addEntry(name, amount, type) {
+    const entry = document.createElement('div');
+    entry.className = 'entry';
+    entry.innerHTML = `
+        <span>${name} - £${amount.toFixed(2)} (${type})</span>
+        <button class="delete-btn">Delete</button>
+    `;
+
+    // Delete Button Event
+    entry.querySelector('.delete-btn').addEventListener('click', () => {
+        removeEntry(entry, amount, type);
+    });
+
+    entriesList.appendChild(entry);
+}
+
+// Remove Entry from List
+function removeEntry(entry, amount, type) {
+    entriesList.removeChild(entry);
+
+    // Update Totals
+    if (type === 'Contribution') {
+        totalCollected -= amount;
+    } else if (type === 'Expense') {
+        totalExpenses -= amount;
+    }
+
+    updateSummary();
+}
+
+// Update Summary
+function updateSummary() {
+    totalCollectedEl.textContent = totalCollected.toFixed(2);
+    totalExpensesEl.textContent = totalExpenses.toFixed(2);
+    remainingBalanceEl.textContent = (totalCollected - totalExpenses).toFixed(2);
+}
