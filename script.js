@@ -1,46 +1,74 @@
-let groups = JSON.parse(localStorage.getItem("groups")) || {}; // Store group data
+// Import Firebase SDKs
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+import { getDatabase, ref, set, push, get, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDhPfAkRKMNMaG2w_tw8TRkjig-UAyas9Q",
+  authDomain: "sharedexpenses-61b37.firebaseapp.com",
+  databaseURL: "https://sharedexpenses-61b37-default-rtdb.firebaseio.com",
+  projectId: "sharedexpenses-61b37",
+  storageBucket: "sharedexpenses-61b37.firebasestorage.app",
+  messagingSenderId: "753946589591",
+  appId: "1:753946589591:web:878c9f294791506da02cd2",
+  measurementId: "G-M6YW4P2D0V",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+// Global Variable for Group Code
 let currentGroup = null;
 
-// Create or Join Group
-document.getElementById("create-group").addEventListener("click", function () {
+// Create Group
+document.getElementById("create-group").addEventListener("click", () => {
   const groupCode = document.getElementById("group-code").value.trim();
   if (!groupCode) {
     alert("Please enter a group code.");
     return;
   }
-  if (groups[groupCode]) {
-    alert("Group code already exists. Try joining it instead.");
-    return;
-  }
-  groups[groupCode] = { budget: {}, records: [] };
-  currentGroup = groupCode;
-  localStorage.setItem("groups", JSON.stringify(groups));
-  updateGroupDisplay();
+
+  // Save group in Firebase
+  set(ref(database, `groups/${groupCode}`), {
+    budget: {},
+    records: [],
+  }).then(() => {
+    currentGroup = groupCode;
+    document.getElementById("group-id").textContent = currentGroup;
+    alert("Group created successfully!");
+  }).catch((error) => {
+    console.error("Error creating group:", error);
+  });
 });
 
-document.getElementById("join-group").addEventListener("click", function () {
+// Join Group
+document.getElementById("join-group").addEventListener("click", () => {
   const groupCode = document.getElementById("group-code").value.trim();
   if (!groupCode) {
     alert("Please enter a group code.");
     return;
   }
-  if (!groups[groupCode]) {
-    alert("Group does not exist. Try creating it first.");
-    return;
-  }
-  currentGroup = groupCode;
-  updateGroupDisplay();
-});
 
-// Update Group Display
-function updateGroupDisplay() {
-  document.getElementById("group-id").innerText = currentGroup || "None";
-  updateExpenseSummary();
-  updateExpenseList();
-}
+  // Check if the group exists in Firebase
+  get(ref(database, `groups/${groupCode}`))
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        currentGroup = groupCode;
+        document.getElementById("group-id").textContent = currentGroup;
+        loadGroupData();
+        alert("Joined group successfully!");
+      } else {
+        alert("Group does not exist. Please create it first.");
+      }
+    })
+    .catch((error) => {
+      console.error("Error joining group:", error);
+    });
+});
 
 // Save Budget
-document.getElementById("budget-form").addEventListener("submit", function (e) {
+document.getElementById("budget-form").addEventListener("submit", (e) => {
   e.preventDefault();
   if (!currentGroup) {
     alert("Please join or create a group first.");
@@ -58,29 +86,19 @@ document.getElementById("budget-form").addEventListener("submit", function (e) {
     budget[extraName] = extraAmount;
   }
 
-  groups[currentGroup].budget = budget;
-  localStorage.setItem("groups", JSON.stringify(groups));
-  updateExpenseSummary();
-  alert("Budget saved successfully!");
+  // Save budget in Firebase
+  set(ref(database, `groups/${currentGroup}/budget`), budget)
+    .then(() => {
+      alert("Budget saved successfully!");
+      loadGroupData();
+    })
+    .catch((error) => {
+      console.error("Error saving budget:", error);
+    });
 });
 
-// Update Expense Summary
-function updateExpenseSummary() {
-  if (!currentGroup) return;
-
-  const summaryElement = document.getElementById("expense-summary");
-  summaryElement.innerHTML = "";
-
-  const budget = groups[currentGroup]?.budget || {};
-  for (const [key, value] of Object.entries(budget)) {
-    const listItem = document.createElement("li");
-    listItem.innerText = `${key}: £${value}`;
-    summaryElement.appendChild(listItem);
-  }
-}
-
-// Add Contribution or Expense
-document.getElementById("expense-form").addEventListener("submit", function (e) {
+// Add Contribution/Expense
+document.getElementById("expense-form").addEventListener("submit", (e) => {
   e.preventDefault();
   if (!currentGroup) {
     alert("Please join or create a group first.");
@@ -90,77 +108,50 @@ document.getElementById("expense-form").addEventListener("submit", function (e) 
   const name = document.getElementById("name").value.trim();
   const amount = parseFloat(document.getElementById("amount").value);
   const type = document.getElementById("type").value;
-  const billUpload = document.getElementById("bill-upload").files[0];
 
   if (!name || isNaN(amount) || amount <= 0) {
-    alert("Please enter valid name and amount.");
+    alert("Please enter valid details.");
     return;
   }
 
-  let billURL = "";
-  if (billUpload) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      billURL = e.target.result;
-      saveRecord(name, amount, type, billURL);
-    };
-    reader.readAsDataURL(billUpload);
-  } else {
-    saveRecord(name, amount, type, billURL);
-  }
+  const newExpense = { name, amount, type };
 
-  e.target.reset();
+  // Push expense to Firebase
+  push(ref(database, `groups/${currentGroup}/records`), newExpense)
+    .then(() => {
+      alert("Expense added successfully!");
+      loadGroupData();
+    })
+    .catch((error) => {
+      console.error("Error adding expense:", error);
+    });
 });
 
-// Save Record
-function saveRecord(name, amount, type, billURL) {
-  const newRecord = { name, amount, type, billURL };
-  groups[currentGroup].records.push(newRecord);
-  localStorage.setItem("groups", JSON.stringify(groups));
-  updateExpenseList();
-}
-
-// Update Expense List
-function updateExpenseList() {
+// Load Group Data
+function loadGroupData() {
   if (!currentGroup) return;
 
-  const expenseList = document.getElementById("expense-list");
-  expenseList.innerHTML = "";
-  let totalContributions = 0;
-  let totalExpenses = 0;
-
-  groups[currentGroup].records.forEach((record, index) => {
-    if (record.type === "contribution") {
-      totalContributions += record.amount;
-    } else {
-      totalExpenses += record.amount;
+  // Load Budget
+  onValue(ref(database, `groups/${currentGroup}/budget`), (snapshot) => {
+    const budget = snapshot.val() || {};
+    const summary = document.getElementById("expense-summary");
+    summary.innerHTML = "";
+    for (const [key, value] of Object.entries(budget)) {
+      const li = document.createElement("li");
+      li.textContent = `${key}: £${value}`;
+      summary.appendChild(li);
     }
-
-    const recordDiv = document.createElement("div");
-    recordDiv.classList.add("expense-item");
-    recordDiv.innerHTML = `
-      <strong>${record.name}</strong> - £${record.amount} (${record.type})
-      ${record.billURL ? `<img src="${record.billURL}" alt="Bill Image">` : ""}
-      <button onclick="deleteRecord(${index})">Delete</button>
-    `;
-    expenseList.appendChild(recordDiv);
   });
 
-  const summary = `
-    <h3>Summary</h3>
-    <p><strong>Total Contributions:</strong> £${totalContributions}</p>
-    <p><strong>Total Expenses:</strong> £${totalExpenses}</p>
-    <p><strong>Remaining Balance:</strong> £${totalContributions - totalExpenses}</p>
-  `;
-  expenseList.innerHTML += summary;
+  // Load Records
+  onValue(ref(database, `groups/${currentGroup}/records`), (snapshot) => {
+    const records = snapshot.val() || {};
+    const recordsList = document.getElementById("records-list");
+    recordsList.innerHTML = "";
+    for (const key in records) {
+      const li = document.createElement("li");
+      li.textContent = `${records[key].name} - £${records[key].amount} (${records[key].type})`;
+      recordsList.appendChild(li);
+    }
+  });
 }
-
-// Delete Record
-function deleteRecord(index) {
-  groups[currentGroup].records.splice(index, 1);
-  localStorage.setItem("groups", JSON.stringify(groups));
-  updateExpenseList();
-}
-
-// Initialize App
-updateGroupDisplay();

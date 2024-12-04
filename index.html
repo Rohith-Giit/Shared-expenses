@@ -21,7 +21,7 @@
       <h2>Create or Join Group</h2>
       <div>
         <label for="group-code">Enter Group Code:</label>
-        <input type="text" id="group-code" placeholder="Unique Group Code" required>
+        <input type="text" id="group-code" placeholder="Unique Group Code">
         <button id="create-group">Create Group</button>
         <button id="join-group">Join Group</button>
       </div>
@@ -34,20 +34,20 @@
       <h2>Set Monthly Budget</h2>
       <form id="budget-form">
         <label for="rent">Rent (£):</label>
-        <input type="number" id="rent" placeholder="Enter monthly rent" required>
-        
+        <input type="number" id="rent" placeholder="Enter monthly rent">
+
         <label for="electricity">Electricity (£):</label>
-        <input type="number" id="electricity" placeholder="Enter monthly electricity bill" required>
+        <input type="number" id="electricity" placeholder="Enter electricity bill">
 
         <label for="wifi">WiFi (£):</label>
-        <input type="number" id="wifi" placeholder="Enter monthly WiFi bill" required>
+        <input type="number" id="wifi" placeholder="Enter WiFi bill">
 
         <label for="extra-name">Extra Name:</label>
-        <input type="text" id="extra-name" placeholder="Enter extra expense name (optional)">
-        
+        <input type="text" id="extra-name" placeholder="Optional extra expense name">
+
         <label for="extra-amount">Extra Amount (£):</label>
-        <input type="number" id="extra-amount" placeholder="Enter extra expense amount (optional)">
-        
+        <input type="number" id="extra-amount" placeholder="Optional extra expense amount">
+
         <button type="submit">Save Budget</button>
       </form>
     </section>
@@ -60,10 +60,10 @@
     <form id="expense-form">
       <h2>Add Contribution or Expense</h2>
       <label for="name">Name:</label>
-      <input type="text" id="name" placeholder="Enter your name" required>
+      <input type="text" id="name" placeholder="Enter your name">
 
       <label for="amount">Amount (£):</label>
-      <input type="number" id="amount" placeholder="Enter amount" required>
+      <input type="number" id="amount" placeholder="Enter amount">
 
       <label for="type">Type:</label>
       <select id="type">
@@ -71,18 +71,18 @@
         <option value="expense">Expense</option>
       </select>
 
-      <label for="bill-upload">Upload Bill (optional):</label>
-      <input type="file" id="bill-upload" accept="image/*">
-      <img id="bill-preview" style="max-width: 200px; display:none;" />
-
       <button type="submit">Add</button>
     </form>
 
     <section id="expense-list">
       <h2>Expense Records</h2>
+      <ul id="records-list"></ul>
     </section>
   </main>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
