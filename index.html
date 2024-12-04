@@ -1,88 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shared Expenses Tracker</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Expenses Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK Placeholder -->
+    <!-- Add Firebase later -->
 </head>
 <body>
-  <header>
-    <h1>Shared Expenses Tracker</h1>
-    <select id="language-selector">
-      <option value="en">English</option>
-      <option value="es">Español</option>
-      <option value="fr">Français</option>
-    </select>
-  </header>
+    <header>
+        <h1>🏠 Shared Expenses Tracker</h1>
+        <p>Manage contributions and expenses with ease!</p>
+    </header>
 
-  <main>
-    <section id="group-management">
-      <h2>Create or Join Group</h2>
-      <div>
-        <label for="group-code">Enter Group Code:</label>
-        <input type="text" id="group-code" placeholder="Unique Group Code">
-        <button id="create-group">Create Group</button>
-        <button id="join-group">Join Group</button>
-      </div>
-      <div id="current-group">
-        <strong>Current Group:</strong> <span id="group-id">None</span>
-      </div>
-    </section>
+    <main>
+        <!-- Add Contribution Section -->
+        <section id="contribution-section">
+            <h2>Add Contribution</h2>
+            <div class="form-group">
+                <input type="text" id="contributorName" placeholder="Contributor's Name" required>
+                <input type="number" id="contributionAmount" placeholder="Amount (£)" required>
+                <button id="addContribution" class="btn">Add Contribution</button>
+            </div>
+        </section>
 
-    <section id="budget-setup">
-      <h2>Set Monthly Budget</h2>
-      <form id="budget-form">
-        <label for="rent">Rent (£):</label>
-        <input type="number" id="rent" placeholder="Enter monthly rent">
+        <!-- Add Expense Section -->
+        <section id="expense-section">
+            <h2>Add Expense</h2>
+            <div class="form-group">
+                <input type="text" id="spenderName" placeholder="Who Paid?" required>
+                <input type="text" id="expenseDescription" placeholder="Expense Description" required>
+                <input type="number" id="expenseAmount" placeholder="Amount (£)" required>
+                <button id="addExpense" class="btn">Add Expense</button>
+            </div>
+        </section>
 
-        <label for="electricity">Electricity (£):</label>
-        <input type="number" id="electricity" placeholder="Enter electricity bill">
+        <!-- Records -->
+        <section id="records-section">
+            <h2>Records</h2>
+            <div id="records">
+                <h3>Contributions</h3>
+                <ul id="contributionRecords"></ul>
+                <h3>Expenses</h3>
+                <ul id="expenseRecords"></ul>
+            </div>
+        </section>
 
-        <label for="wifi">WiFi (£):</label>
-        <input type="number" id="wifi" placeholder="Enter WiFi bill">
+        <!-- Totals -->
+        <section id="totals-section">
+            <h2>Totals</h2>
+            <p>Total Collected: £<span id="totalCollected">0</span></p>
+            <p>Remaining Balance: £<span id="remainingBalance">0</span></p>
+        </section>
+    </main>
 
-        <label for="extra-name">Extra Name:</label>
-        <input type="text" id="extra-name" placeholder="Optional extra expense name">
+    <footer>
+        <p>© 2024 Shared Expenses Tracker</p>
+    </footer>
 
-        <label for="extra-amount">Extra Amount (£):</label>
-        <input type="number" id="extra-amount" placeholder="Optional extra expense amount">
-
-        <button type="submit">Save Budget</button>
-      </form>
-    </section>
-
-    <section id="recurring-expenses">
-      <h2>Recurring Expenses</h2>
-      <ul id="expense-summary"></ul>
-    </section>
-
-    <form id="expense-form">
-      <h2>Add Contribution or Expense</h2>
-      <label for="name">Name:</label>
-      <input type="text" id="name" placeholder="Enter your name">
-
-      <label for="amount">Amount (£):</label>
-      <input type="number" id="amount" placeholder="Enter amount">
-
-      <label for="type">Type:</label>
-      <select id="type">
-        <option value="contribution">Contribution</option>
-        <option value="expense">Expense</option>
-      </select>
-
-      <button type="submit">Add</button>
-    </form>
-
-    <section id="expense-list">
-      <h2>Expense Records</h2>
-      <ul id="records-list"></ul>
-    </section>
-  </main>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
+
+
