@@ -1,64 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Room Expense Tracker</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shared Expenses Tracker</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <h2>Fixed Monthly Expenses</h2>
-            <ul>
-                <li>🏠 Rent: £500 (Paid on 1st of every month)</li>
-                <li>🌐 Broadband (EE): £30</li>
-                <li>⚡ Rebel Energy (Electricity & Gas): £233</li>
-            </ul>
-        </aside>
+  <header>
+    <h1>Shared Expenses Tracker</h1>
+    <select id="language-selector">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+    </select>
+  </header>
 
-        <!-- Main Content -->
-        <main>
-            <h1>Shared Accommodation Finance</h1>
+  <main>
+    <section id="group-management">
+      <h2>Create or Join Group</h2>
+      <div>
+        <label for="group-code">Enter Group Code:</label>
+        <input type="text" id="group-code" placeholder="Unique Group Code" required>
+        <button id="create-group">Create Group</button>
+        <button id="join-group">Join Group</button>
+      </div>
+      <div id="current-group">
+        <strong>Current Group:</strong> <span id="group-id">None</span>
+      </div>
+    </section>
 
-            <!-- Contribution Section -->
-            <section>
-                <h2>Add Contribution</h2>
-                <input type="text" id="contributorName" placeholder="Contributor's Name" />
-                <input type="number" id="contributionAmount" placeholder="Amount (£)" />
-                <button id="addContribution">Add Contribution</button>
-            </section>
+    <section id="budget-setup">
+      <h2>Set Monthly Budget</h2>
+      <form id="budget-form">
+        <label for="rent">Rent (£):</label>
+        <input type="number" id="rent" placeholder="Enter monthly rent" required>
+        
+        <label for="electricity">Electricity (£):</label>
+        <input type="number" id="electricity" placeholder="Enter monthly electricity bill" required>
 
-            <!-- Expense Section -->
-            <section>
-                <h2>Add Expense</h2>
-                <input type="text" id="expensePerson" placeholder="Person Adding Expense" />
-                <input type="text" id="expenseDescription" placeholder="Expense Description" />
-                <input type="number" id="expenseAmount" placeholder="Amount (£)" />
-                <input type="file" id="expenseImage" accept="image/*" />
-                <button id="addExpense">Add Expense</button>
-            </section>
+        <label for="wifi">WiFi (£):</label>
+        <input type="number" id="wifi" placeholder="Enter monthly WiFi bill" required>
 
-            <!-- Summary Section -->
-            <section>
-                <h2>Summary</h2>
-                <p><b>Total Collected:</b> £<span id="totalCollected">0</span></p>
-                <p><b>Remaining Balance:</b> £<span id="remainingBalance">0</span></p>
-            </section>
+        <label for="extra-name">Extra Name:</label>
+        <input type="text" id="extra-name" placeholder="Enter extra expense name (optional)">
+        
+        <label for="extra-amount">Extra Amount (£):</label>
+        <input type="number" id="extra-amount" placeholder="Enter extra expense amount (optional)">
+        
+        <button type="submit">Save Budget</button>
+      </form>
+    </section>
 
-            <!-- Records Section -->
-            <section>
-                <h2>Records</h2>
-                <h3>Contributions</h3>
-                <div id="contributionRecords"></div>
+    <section id="recurring-expenses">
+      <h2>Recurring Expenses</h2>
+      <ul id="expense-summary"></ul>
+    </section>
 
-                <h3>Expenses</h3>
-                <div id="expenseRecords"></div>
-            </section>
-        </main>
-    </div>
+    <form id="expense-form">
+      <h2>Add Contribution or Expense</h2>
+      <label for="name">Name:</label>
+      <input type="text" id="name" placeholder="Enter your name" required>
 
-    <script src="script.js"></script>
+      <label for="amount">Amount (£):</label>
+      <input type="number" id="amount" placeholder="Enter amount" required>
+
+      <label for="type">Type:</label>
+      <select id="type">
+        <option value="contribution">Contribution</option>
+        <option value="expense">Expense</option>
+      </select>
+
+      <label for="bill-upload">Upload Bill (optional):</label>
+      <input type="file" id="bill-upload" accept="image/*">
+      <img id="bill-preview" style="max-width: 200px; display:none;" />
+
+      <button type="submit">Add</button>
+    </form>
+
+    <section id="expense-list">
+      <h2>Expense Records</h2>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>
