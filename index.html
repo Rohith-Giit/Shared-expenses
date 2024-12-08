@@ -3,64 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shared Expenses Tracker</title>
+    <title>NOTEBUDGET</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Firebase SDK Placeholder -->
-    <!-- Add Firebase later -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js -->
 </head>
 <body>
     <header>
-        <h1>🏠 Shared Expenses Tracker</h1>
-        <p>Manage contributions and expenses with ease!</p>
+        <h1>NOTEBUDGET</h1>
+        <p>Track contributions and expenses seamlessly!</p>
     </header>
 
+    <nav>
+        <button class="tab-btn" data-tab="main-section">Contributions & Expenses</button>
+        <button class="tab-btn" data-tab="group-section">Group Settings</button>
+    </nav>
+
     <main>
-        <!-- Add Contribution Section -->
-        <section id="contribution-section">
-            <h2>Add Contribution</h2>
+        <!-- Main Section: Contributions and Expenses -->
+        <section id="main-section" class="tab-content active">
+            <h2>Contributions & Expenses</h2>
+            <!-- Rent Contribution -->
             <div class="form-group">
                 <input type="text" id="contributorName" placeholder="Contributor's Name" required>
                 <input type="number" id="contributionAmount" placeholder="Amount (£)" required>
                 <button id="addContribution" class="btn">Add Contribution</button>
             </div>
-        </section>
+            <ul id="contributionRecords"></ul>
+            <p>Total Rent Collected: £<span id="totalRentCollected">0</span></p>
+            <p>Remaining Balance: £<span id="remainingBalance">0</span></p>
 
-        <!-- Add Expense Section -->
-        <section id="expense-section">
-            <h2>Add Expense</h2>
+            <!-- Shared Expenses -->
             <div class="form-group">
-                <input type="text" id="spenderName" placeholder="Who Paid?" required>
-                <input type="text" id="expenseDescription" placeholder="Expense Description" required>
+                <input type="text" id="expenseName" placeholder="Expense Name" required>
                 <input type="number" id="expenseAmount" placeholder="Amount (£)" required>
                 <button id="addExpense" class="btn">Add Expense</button>
             </div>
+            <ul id="expenseRecords"></ul>
+            <p>Total Expenses: £<span id="totalExpenses">0</span></p>
         </section>
 
-        <!-- Records -->
-        <section id="records-section">
-            <h2>Records</h2>
-            <div id="records">
-                <h3>Contributions</h3>
-                <ul id="contributionRecords"></ul>
-                <h3>Expenses</h3>
-                <ul id="expenseRecords"></ul>
+        <!-- Group Settings Section -->
+        <section id="group-section" class="tab-content">
+            <h2>Group Settings</h2>
+            <div>
+                <button id="generateGroupCode" class="btn">Generate Group Code</button>
+                <p>Your Group Code: <span id="groupCode"></span></p>
             </div>
-        </section>
-
-        <!-- Totals -->
-        <section id="totals-section">
-            <h2>Totals</h2>
-            <p>Total Collected: £<span id="totalCollected">0</span></p>
-            <p>Remaining Balance: £<span id="remainingBalance">0</span></p>
+            <div class="form-group">
+                <input type="text" id="joinGroupCode" placeholder="Enter Group Code" required>
+                <button id="joinGroup" class="btn">Join Group</button>
+            </div>
+            <p id="groupStatusMessage"></p>
         </section>
     </main>
 
     <footer>
-        <p>© 2024 Shared Expenses Tracker</p>
+        <p>© 2024 NOTEBUDGET</p>
     </footer>
 
     <script src="script.js"></script>
 </body>
 </html>
-
-
