@@ -5,28 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NOTEBUDGET</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header>
-        <h1>NOTEBUDGET</h1>
+        <h1>
+            <img src="logo.png" alt="Logo" id="logo"> NOTEBUDGET
+        </h1>
         <p>Track contributions and expenses seamlessly!</p>
+        <button id="logout" class="logout-btn" title="Logout" hidden>
+            <img src="logout-icon.png" alt="Logout">
+        </button>
     </header>
 
     <nav>
-        <button class="tab-btn" data-tab="main-section">Contributions & Expenses</button>
         <button class="tab-btn" data-tab="group-section">Group Settings</button>
+        <button class="tab-btn" data-tab="main-section" id="contributionsTab" disabled>Contributions & Expenses</button>
     </nav>
 
     <main>
-        <!-- Main Section: Contributions and Expenses -->
-        <section id="main-section" class="tab-content active">
+        <!-- Group Settings Section -->
+        <section id="group-section" class="tab-content active">
+            <h2>Group Settings</h2>
+            <div class="form-group">
+                <input type="text" id="groupName" placeholder="Enter Group Name" required>
+                <button id="createGroup" class="btn primary-btn">Create Group</button>
+            </div>
+            <p>Your Group Code: <span id="groupCode"></span></p>
+            <div class="form-group">
+                <input type="text" id="joinGroupCode" placeholder="Enter Group Code" required>
+                <button id="joinGroup" class="btn primary-btn">Join Group</button>
+            </div>
+            <p id="groupStatusMessage"></p>
+        </section>
+
+        <!-- Contributions and Expenses Section -->
+        <section id="main-section" class="tab-content">
             <h2>Contributions & Expenses</h2>
+
             <!-- Rent Contribution -->
             <div class="form-group">
                 <input type="text" id="contributorName" placeholder="Contributor's Name" required>
                 <input type="number" id="contributionAmount" placeholder="Amount (£)" required>
-                <button id="addContribution" class="btn">Add Contribution</button>
+                <select id="monthSelector">
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="December">December</option>
+                </select>
+                <input type="number" id="yearSelector" value="2024" readonly>
+                <button id="addContribution" class="btn primary-btn">Add Contribution</button>
             </div>
             <ul id="contributionRecords"></ul>
             <p>Total Rent Collected: £<span id="totalRentCollected">0</span></p>
@@ -34,26 +62,14 @@
 
             <!-- Shared Expenses -->
             <div class="form-group">
+                <input type="text" id="personName" placeholder="Person Adding" required>
                 <input type="text" id="expenseName" placeholder="Expense Name" required>
                 <input type="number" id="expenseAmount" placeholder="Amount (£)" required>
-                <button id="addExpense" class="btn">Add Expense</button>
+                <input type="file" id="expenseReceipt">
+                <button id="addExpense" class="btn secondary-btn">Add Expense</button>
             </div>
             <ul id="expenseRecords"></ul>
             <p>Total Expenses: £<span id="totalExpenses">0</span></p>
-        </section>
-
-        <!-- Group Settings Section -->
-        <section id="group-section" class="tab-content">
-            <h2>Group Settings</h2>
-            <div>
-                <button id="generateGroupCode" class="btn">Generate Group Code</button>
-                <p>Your Group Code: <span id="groupCode"></span></p>
-            </div>
-            <div class="form-group">
-                <input type="text" id="joinGroupCode" placeholder="Enter Group Code" required>
-                <button id="joinGroup" class="btn">Join Group</button>
-            </div>
-            <p id="groupStatusMessage"></p>
         </section>
     </main>
 
