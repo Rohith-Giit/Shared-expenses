@@ -1,118 +1,110 @@
 /* General Styling */
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
-  background: linear-gradient(180deg, #f5f7fa, #c3d6e9);
-  color: #333;
+  background: linear-gradient(180deg, #222831, #393e46);
+  color: #eeeeee;
 }
 
 header {
-  background: linear-gradient(90deg, #007bff, #00a8ff);
+  background: #00adb5;
   color: white;
+  padding: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
 }
 
 header h1 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  font-size: 2rem;
+  margin: 0;
 }
 
-header #logo {
-  width: 40px;
-  height: 40px;
+#logo {
+  width: 50px;
+  margin-right: 15px;
 }
 
-header .logout-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-header .logout-btn img {
-  width: 30px;
-  height: 30px;
-}
-
-nav {
+/* Navbar */
+.navbar {
   display: flex;
   justify-content: center;
-  background: #f7f9fc;
-  padding: 10px 0;
+  background: #393e46;
+  padding: 10px;
 }
 
 .tab-btn {
-  background: none;
   border: none;
-  padding: 10px 20px;
+  background: none;
   font-size: 1rem;
+  color: #00adb5;
+  margin: 0 10px;
   cursor: pointer;
-  color: #007bff;
 }
 
 .tab-btn:hover {
-  background: #e7f3ff;
-  border-radius: 5px;
+  color: #eeeeee;
 }
 
-.tab-content {
-  display: none;
+/* Dashboard Cards */
+.dashboard-container {
   padding: 20px;
 }
 
-.tab-content.active {
-  display: block;
+.card {
+  background: #393e46;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+}
+
+.card h3 {
+  margin: 0 0 10px;
+}
+
+.card p {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.records-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.records-list li {
+  background: #222831;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  color: #eeeeee;
 }
 
 /* Buttons */
 .btn {
-  padding: 10px 15px;
+  padding: 10px 20px;
   border: none;
-  cursor: pointer;
   border-radius: 5px;
+  cursor: pointer;
 }
 
 .primary-btn {
-  background: #007bff;
+  background: #00adb5;
+  color: white;
+}
+
+.secondary-btn {
+  background: #f05454;
   color: white;
 }
 
 .primary-btn:hover {
-  background: #0056b3;
-}
-
-.secondary-btn {
-  background: #28a745;
-  color: white;
+  background: #007c87;
 }
 
 .secondary-btn:hover {
-  background: #1d7433;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  padding: 10px;
-  margin: 5px 0;
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-
-footer {
-  background: #007bff;
-  color: white;
-  text-align: center;
-  padding: 10px;
+  background: #d43d3d;
 }

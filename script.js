@@ -1,81 +1,101 @@
 // State Management
 let groupCode = "";
 let contributions = [];
+let expenses = [];
 let totalRentCollected = 0;
 let totalExpenses = 0;
 
-// Auto-login if group code exists
-window.addEventListener("load", () => {
-    const savedGroupCode = localStorage.getItem("groupCode");
-    if (savedGroupCode) {
-        groupCode = savedGroupCode;
-        autoLogin();
-    }
-});
-
 // Auto-login logic
 function autoLogin() {
-    document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
-    document.getElementById("main-section").classList.add("active");
+    switchToTab("main-section");
     document.getElementById("contributionsTab").disabled = false;
     document.getElementById("logout").hidden = false;
 }
 
-// Create Group
-document.getElementById("createGroup").addEventListener("click", () => {
-    const groupName = document.getElementById("groupName").value;
-    if (groupName.trim()) {
-        groupCode = groupName.toUpperCase() + Math.random().toString(36).substr(2, 5).toUpperCase();
-        document.getElementById("groupCode").textContent = groupCode;
-        alert(`Group "${groupName}" created successfully! Share the code: ${groupCode}`);
-    } else {
-        alert("Please enter a group name.");
+// Populate Year Selector
+window.addEventListener("load", () => {
+    const currentYear = new Date().getFullYear();
+    const yearSelector = document.getElementById("yearSelector");
+    for (let i = currentYear - 10; i <= currentYear + 10; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = i;
+        if (i === currentYear) option.selected = true;
+        yearSelector.appendChild(option);
     }
 });
 
-// Join Group
-document.getElementById("joinGroup").addEventListener("click", () => {
-    const enteredCode = document.getElementById("joinGroupCode").value;
-    if (enteredCode === groupCode) {
-        localStorage.setItem("groupCode", enteredCode);
-        autoLogin();
-    } else {
-        alert("Invalid group code.");
-    }
-});
-
-// Add Contribution
+// Add Contributions
 document.getElementById("addContribution").addEventListener("click", () => {
     const name = document.getElementById("contributorName").value;
     const amount = parseFloat(document.getElementById("contributionAmount").value);
     const month = document.getElementById("monthSelector").value;
+    const year = document.getElementById("yearSelector").value;
 
-    if (name && !isNaN(amount) && amount > 0) {
-        contributions.push({ name, amount, month });
+    if (name && amount > 0) {
+        contributions.push({ name, amount, month, year, dateAdded: new Date().toLocaleString() });
         totalRentCollected += amount;
-        updateContributions();
+        updateUI();
+        updateContributionRecords();
     } else {
-        alert("Enter valid contribution details.");
+        alert("Please fill in all fields with valid information.");
     }
 });
 
-// Add Expense
+// Add Expenses
 document.getElementById("addExpense").addEventListener("click", () => {
-    const name = document.getElementById("expenseName").value;
+    const person = document.getElementById("personName").value;
+    const expenseName = document.getElementById("expenseName").value;
     const amount = parseFloat(document.getElementById("expenseAmount").value);
 
-    if (name && !isNaN(amount) && amount > 0) {
+    if (person && expenseName && amount > 0) {
+        expenses.push({
+            person,
+            name: expenseName,
+            amount,
+            dateAdded: new Date().toLocaleString(),
+        });
         totalExpenses += amount;
-        updateContributions();
+        updateUI();
+        updateExpenseRecords();
     } else {
-        alert("Enter valid expense details.");
+        alert("Please fill in all fields with valid expense details.");
     }
 });
 
-// Update Contributions
-function updateContributions() {
+// Update the UI for totals and remaining balance
+function updateUI() {
     const remainingBalance = totalRentCollected - totalExpenses;
+
     document.getElementById("totalRentCollected").textContent = totalRentCollected.toFixed(2);
-    document.getElementById("remainingBalance").textContent = remainingBalance.toFixed(2);
     document.getElementById("totalExpenses").textContent = totalExpenses.toFixed(2);
+    document.getElementById("remainingBalance").textContent = remainingBalance.toFixed(2);
+}
+
+// Update Contribution Records
+function updateContributionRecords() {
+    const contributionList = document.getElementById("contributionRecords");
+    contributionList.innerHTML = "";
+    contributions.forEach((c) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${c.name}</strong> contributed £${c.amount.toFixed(
+            2
+        )} for ${c.month} ${c.year}
+        <br><span class="date-added">Added on: ${c.dateAdded}</span>`;
+        contributionList.appendChild(li);
+    });
+}
+
+// Update Expense Records
+function updateExpenseRecords() {
+    const expenseList = document.getElementById("expenseRecords");
+    expenseList.innerHTML = "";
+    expenses.forEach((e) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${e.person}</strong> added an expense: ${e.name} (£${e.amount.toFixed(
+            2
+        )})
+        <br><span class="date-added">Added on: ${e.dateAdded}</span>`;
+        expenseList.appendChild(li);
+    });
 }
