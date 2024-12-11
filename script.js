@@ -1,101 +1,136 @@
-// State Management
-let groupCode = "";
-let contributions = [];
-let expenses = [];
-let totalRentCollected = 0;
-let totalExpenses = 0;
+// State
+const state = {
+    contributions: [], // Stores all contributions
+    expenses: [],      // Stores all expenses
+};
 
-// Auto-login logic
-function autoLogin() {
-    switchToTab("main-section");
-    document.getElementById("contributionsTab").disabled = false;
-    document.getElementById("logout").hidden = false;
-}
+// DOM Elements
+const totalRentCollected = document.getElementById("totalRentCollected");
+const totalExpenses = document.getElementById("totalExpenses");
+const remainingBalance = document.getElementById("remainingBalance");
+const rentCollectedCard = document.getElementById("rentCollectedCard");
+const expensesCard = document.getElementById("expensesCard");
+const historyModal = document.getElementById("historyModal");
+const historyList = document.getElementById("historyList");
+const closeModalButton = document.getElementById("closeModal");
 
-// Populate Year Selector
-window.addEventListener("load", () => {
-    const currentYear = new Date().getFullYear();
-    const yearSelector = document.getElementById("yearSelector");
-    for (let i = currentYear - 10; i <= currentYear + 10; i++) {
-        const option = document.createElement("option");
-        option.value = i;
-        option.textContent = i;
-        if (i === currentYear) option.selected = true;
-        yearSelector.appendChild(option);
-    }
-});
-
-// Add Contributions
-document.getElementById("addContribution").addEventListener("click", () => {
-    const name = document.getElementById("contributorName").value;
+// Add Rent Contribution
+document.getElementById("addContributionButton").addEventListener("click", () => {
+    const name = document.getElementById("contributorName").value.trim();
     const amount = parseFloat(document.getElementById("contributionAmount").value);
-    const month = document.getElementById("monthSelector").value;
-    const year = document.getElementById("yearSelector").value;
 
-    if (name && amount > 0) {
-        contributions.push({ name, amount, month, year, dateAdded: new Date().toLocaleString() });
-        totalRentCollected += amount;
-        updateUI();
-        updateContributionRecords();
-    } else {
-        alert("Please fill in all fields with valid information.");
+    if (!name || isNaN(amount) || amount <= 0) {
+        alert("Please enter valid contribution details!");
+        return;
     }
+
+    // Add to state
+    state.contributions.push({ name, amount, date: new Date().toLocaleDateString() });
+
+    // Update UI
+    updateSummary();
+    resetForm(["contributorName", "contributionAmount"]);
+    alert("Contribution added!");
 });
 
-// Add Expenses
-document.getElementById("addExpense").addEventListener("click", () => {
-    const person = document.getElementById("personName").value;
-    const expenseName = document.getElementById("expenseName").value;
+// Add Expense
+document.getElementById("addExpenseButton").addEventListener("click", () => {
+    const name = document.getElementById("expenseName").value.trim();
     const amount = parseFloat(document.getElementById("expenseAmount").value);
+    const receipt = document.getElementById("expenseReceipt").files[0];
 
-    if (person && expenseName && amount > 0) {
-        expenses.push({
-            person,
-            name: expenseName,
-            amount,
-            dateAdded: new Date().toLocaleString(),
-        });
-        totalExpenses += amount;
-        updateUI();
-        updateExpenseRecords();
-    } else {
-        alert("Please fill in all fields with valid expense details.");
+    if (!name || isNaN(amount) || amount <= 0) {
+        alert("Please enter valid expense details!");
+        return;
     }
+
+    const receiptURL = receipt ? URL.createObjectURL(receipt) : null;
+
+    // Add to state
+    state.expenses.push({ name, amount, receiptURL, date: new Date().toLocaleDateString() });
+
+    // Update UI
+    updateSummary();
+    resetForm(["expenseName", "expenseAmount", "expenseReceipt"]);
+    alert("Expense added!");
 });
 
-// Update the UI for totals and remaining balance
-function updateUI() {
-    const remainingBalance = totalRentCollected - totalExpenses;
+// Update Summary
+function updateSummary() {
+    const totalRent = state.contributions.reduce((sum, c) => sum + c.amount, 0);
+    const totalExpense = state.expenses.reduce((sum, e) => sum + e.amount, 0);
+    const remaining = totalRent - totalExpense;
 
-    document.getElementById("totalRentCollected").textContent = totalRentCollected.toFixed(2);
-    document.getElementById("totalExpenses").textContent = totalExpenses.toFixed(2);
-    document.getElementById("remainingBalance").textContent = remainingBalance.toFixed(2);
+    // Update DOM
+    totalRentCollected.textContent = totalRent.toFixed(2);
+    totalExpenses.textContent = totalExpense.toFixed(2);
+    remainingBalance.textContent = remaining.toFixed(2);
+
+    // Animate changes
+    animateHighlight([totalRentCollected, totalExpenses, remainingBalance]);
 }
 
-// Update Contribution Records
-function updateContributionRecords() {
-    const contributionList = document.getElementById("contributionRecords");
-    contributionList.innerHTML = "";
-    contributions.forEach((c) => {
-        const li = document.createElement("li");
-        li.innerHTML = `<strong>${c.name}</strong> contributed £${c.amount.toFixed(
-            2
-        )} for ${c.month} ${c.year}
-        <br><span class="date-added">Added on: ${c.dateAdded}</span>`;
-        contributionList.appendChild(li);
+// Animate Highlight
+function animateHighlight(elements) {
+    elements.forEach((el) => {
+        el.classList.add("highlight");
+        setTimeout(() => el.classList.remove("highlight"), 500);
     });
 }
 
-// Update Expense Records
-function updateExpenseRecords() {
-    const expenseList = document.getElementById("expenseRecords");
-    expenseList.innerHTML = "";
-    expenses.forEach((e) => {
-        const li = document.createElement("li");
-        li.innerHTML = `<strong>${e.person}</strong> added an expense: ${e.name} (£${e.amount.toFixed(
-            2
-        )})
-        <br><span class="date-added">Added on: ${e.dateAdded}</span>`;
-        expenseList.appendChild(li);
+// View Rent History
+rentCollectedCard.addEventListener("click", () => {
+    displayHistory(state.contributions, "Rent Contributions");
+    historyModal.classList.add("show");
+});
+
+// View Expense History
+expensesCard.addEventListener("click", () => {
+    displayHistory(state.expenses, "Expense History");
+    historyModal.classList.add("show");
+});
+
+// Display History
+function displayHistory(data, title) {
+    document.getElementById("modalTitle").textContent = title;
+    historyList.innerHTML = "";
+
+    if (data.length === 0) {
+        historyList.innerHTML = "<li>No records available</li>";
+    } else {
+        data.forEach((item) => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+                ${item.name} - £${item.amount} (${item.date})
+                ${
+                    item.receiptURL
+                        ? `<a href="${item.receiptURL}" target="_blank">View Receipt</a>`
+                        : ""
+                }
+            `;
+            historyList.appendChild(li);
+        });
+    }
+}
+
+// Close Modal
+closeModalButton.addEventListener("click", () => historyModal.classList.remove("show"));
+historyModal.addEventListener("click", (e) => {
+    if (e.target === historyModal) historyModal.classList.remove("show");
+});
+
+// Reset Form
+function resetForm(fields) {
+    fields.forEach((id) => {
+        const field = document.getElementById(id);
+        if (field.type === "file") field.value = null;
+        else field.value = "";
     });
 }
+// Sidebar Toggle
+const sidebar = document.getElementById("sidebar");
+const toggleSidebarButton = document.getElementById("toggleSidebar");
+
+toggleSidebarButton.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+});

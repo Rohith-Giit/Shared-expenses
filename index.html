@@ -3,111 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOTEBUDGET</title>
+    <title>NoteBudget🏠</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js" defer></script>
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <img src="logo.png" alt="NOTEBUDGET Logo" id="logo">
-            <h1>NOTEBUDGET</h1>
-            <button id="logout" class="logout-btn" title="Logout" hidden>
-                <img src="logout-icon.png" alt="Logout">
-            </button>
-        </div>
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+        <a href="#profile"><span class="icon">👤</span> Profile</a>
+        <a href="#settings"><span class="icon">⚙️</span> Settings</a>
+        <a href="#guide"><span class="icon">❓</span> Guide</a>
+    </aside>
+
+    <!-- Header -->
+    <header class="top-nav">
+        <button id="toggleSidebar" class="menu-btn">☰</button>
+        <h1>NoteBudget🏠</h1>
     </header>
 
-    <nav class="navbar">
-        <button class="tab-btn" data-tab="group-section">Group Settings</button>
-        <button class="tab-btn" data-tab="main-section" id="contributionsTab" disabled>Dashboard</button>
-    </nav>
+    <!-- Add Contribution Section -->
+    <section id="addContributionSection">
+        <h2>Add Rent Contribution</h2>
+        <div class="form-group">
+            <input type="text" id="contributorName" placeholder="Contributor's Name" class="animated-input" required>
+            <input type="number" id="contributionAmount" placeholder="Amount (£)" class="animated-input" required>
+            <button id="addContributionButton" class="btn primary-btn animated-btn">Add Contribution</button>
+        </div>
+    </section>
 
-    <main>
-        <!-- Group Settings Section -->
-        <section id="group-section" class="tab-content active">
-            <div class="card">
-                <h2>Create or Join a Group</h2>
-                <div class="form-group">
-                    <input type="text" id="groupName" placeholder="Enter Group Name" required>
-                    <button id="createGroup" class="btn primary-btn">Create Group</button>
-                </div>
-                <p>Your Group Code: <span id="groupCode"></span></p>
-                <div class="form-group">
-                    <input type="text" id="joinGroupCode" placeholder="Enter Group Code" required>
-                    <button id="joinGroup" class="btn secondary-btn">Join Group</button>
-                </div>
-                <p id="groupStatusMessage"></p>
-            </div>
-        </section>
+    <!-- Add Expense Section -->
+    <section id="addExpenseSection">
+        <h2>Add Expense</h2>
+        <div class="form-group">
+            <input type="text" id="expenseName" placeholder="Expense Name" class="animated-input" required>
+            <input type="number" id="expenseAmount" placeholder="Amount (£)" class="animated-input" required>
+            <input type="file" id="expenseReceipt" accept="image/*" class="animated-input">
+            <button id="addExpenseButton" class="btn secondary-btn animated-btn">Add Expense</button>
+        </div>
+    </section>
 
-        <!-- Dashboard Section -->
-        <section id="main-section" class="tab-content">
-            <div class="dashboard-container">
-                <!-- Overview Cards -->
-                <div class="overview">
-                    <div class="card">
-                        <h3>Total Rent Collected</h3>
-                        <p>£<span id="totalRentCollected">0</span></p>
-                    </div>
-                    <div class="card">
-                        <h3>Total Expenses</h3>
-                        <p>£<span id="totalExpenses">0</span></p>
-                    </div>
-                    <div class="card">
-                        <h3>Remaining Balance</h3>
-                        <p>£<span id="remainingBalance">0</span></p>
-                    </div>
-                </div>
-
-                <!-- Contributions Section -->
-                <div class="section">
-                    <h2>Contributions</h2>
-                    <div class="form-group">
-                        <input type="text" id="contributorName" placeholder="Contributor's Name" required>
-                        <input type="number" id="contributionAmount" placeholder="Amount (£)" required>
-                        <select id="monthSelector">
-                            <option value="January">January</option>
-                            <option value="February">February</option>
-                            <option value="March">March</option>
-                            <option value="April">April</option>
-                            <option value="May">May</option>
-                            <option value="June">June</option>
-                            <option value="July">July</option>
-                            <option value="August">August</option>
-                            <option value="September">September</option>
-                            <option value="October">October</option>
-                            <option value="November">November</option>
-                            <option value="December">December</option>
-                        </select>
-                        <select id="yearSelector">
-                            <!-- Years will be added dynamically -->
-                        </select>
-                        <button id="addContribution" class="btn primary-btn">Add Contribution</button>
-                    </div>
-                    <ul id="contributionRecords" class="records-list"></ul>
-                </div>
-
-                <!-- Expenses Section -->
-                <div class="section">
-                    <h2>Expenses</h2>
-                    <div class="form-group">
-                        <input type="text" id="personName" placeholder="Person Adding" required>
-                        <input type="text" id="expenseName" placeholder="Expense Name" required>
-                        <input type="number" id="expenseAmount" placeholder="Amount (£)" required>
-                        <input type="file" id="expenseReceipt">
-                        <button id="addExpense" class="btn secondary-btn">Add Expense</button>
-                    </div>
-                    <ul id="expenseRecords" class="records-list"></ul>
-                </div>
-            </div>
-        </section>
-    </main>
-
+    <!-- Bottom Summary Section -->
     <footer>
-        <p>© 2024 NOTEBUDGET</p>
+        <div class="summary-card" id="rentCollectedCard">
+            <h3>Total Rent Collected</h3>
+            <p>£<span id="totalRentCollected">0</span></p>
+        </div>
+        <div class="summary-card" id="expensesCard">
+            <h3>Total Expenses</h3>
+            <p>£<span id="totalExpenses">0</span></p>
+        </div>
+        <div class="summary-card" id="remainingBalanceCard">
+            <h3>Remaining Balance</h3>
+            <p>£<span id="remainingBalance">0</span></p>
+        </div>
     </footer>
 
-    <script src="script.js"></script>
+    <!-- History Modal -->
+    <div id="historyModal" class="modal hidden">
+        <div class="modal-content">
+            <span id="closeModal" class="close-btn">&times;</span>
+            <h3 id="modalTitle">History</h3>
+            <ul id="historyList" class="history-list"></ul>
+        </div>
+    </div>
 </body>
 </html>
+<aside id="sidebar" class="sidebar">
+    <a href="#profile"><span class="icon">👤</span> Profile</a>
+    <a href="#settings"><span class="icon">⚙️</span> Settings</a>
+    <a href="#guide"><span class="icon">❓</span> Guide</a>
+</aside>
+
+<header class="top-nav">
+    <button id="toggleSidebar" class="menu-btn">☰</button>
+    <h1>NoteBudget🏠</h1>
+</header>

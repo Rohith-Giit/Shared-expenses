@@ -1,110 +1,187 @@
-/* General Styling */
+/* General Styles */
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: linear-gradient(180deg, #222831, #393e46);
-  color: #eeeeee;
+  background: linear-gradient(to bottom right, #1e3c72, #2a5298);
+  color: #ecf0f1;
 }
 
+/* Header */
 header {
-  background: #00adb5;
-  color: white;
-  padding: 20px;
+  background: #34495e;
+  padding: 15px;
+  color: #f1c40f;
   display: flex;
   justify-content: space-between;
-  align-items: center;
 }
 
-header h1 {
-  font-size: 2rem;
-  margin: 0;
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  background: #34495e;
+  color: white;
+  transition: 0.3s ease;
 }
 
-#logo {
-  width: 50px;
-  margin-right: 15px;
+.sidebar.open {
+  left: 0;
 }
 
-/* Navbar */
-.navbar {
-  display: flex;
-  justify-content: center;
-  background: #393e46;
-  padding: 10px;
+.sidebar a {
+  display: block;
+  padding: 15px 20px;
+  text-decoration: none;
+  color: white;
 }
 
-.tab-btn {
-  border: none;
-  background: none;
+/* Form Group */
+.form-group {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.animated-input {
+  width: 80%;
+  margin: 10px 0;
+  padding: 12px;
   font-size: 1rem;
-  color: #00adb5;
-  margin: 0 10px;
+  border: 2px solid #1abc9c;
+  border-radius: 5px;
+  background: #f9f9f9;
+  color: #2c3e50;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.animated-input:focus {
+  box-shadow: 0 0 8px #16a085;
+  transform: scale(1.03);
+  outline: none;
+}
+
+.animated-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 20px;
+  background: #2980b9;
+  color: white;
+  font-size: 1rem;
   cursor: pointer;
+  transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
 
-.tab-btn:hover {
-  color: #eeeeee;
+.animated-btn:hover {
+  background: #3498db;
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Dashboard Cards */
-.dashboard-container {
-  padding: 20px;
+/* Summary Section */
+footer {
+  display: flex;
+  justify-content: space-around;
+  padding: 15px 0;
+  background: #34495e;
+  color: white;
 }
 
-.card {
-  background: #393e46;
+.summary-card {
+  background: #2c3e50;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  margin-bottom: 20px;
-}
-
-.card h3 {
-  margin: 0 0 10px;
-}
-
-.card p {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.records-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 10px;
-}
-
-.records-list li {
-  background: #222831;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 5px;
-  color: #eeeeee;
-}
-
-/* Buttons */
-.btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
+  text-align: center;
   cursor: pointer;
+  width: 30%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.primary-btn {
-  background: #00adb5;
+.summary-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background: #34495e;
+  padding: 20px;
+  border-radius: 10px;
   color: white;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
 }
 
-.secondary-btn {
-  background: #f05454;
+.history-list li a {
+  color: #1abc9c;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: 10px;
+}
+/* Sidebar Styles */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -250px; /* Sidebar hidden by default */
+  width: 250px;
+  height: 100%;
+  background: #2c3e50;
   color: white;
+  transition: left 0.3s ease; /* Smooth slide-in animation */
+  z-index: 1000;
 }
 
-.primary-btn:hover {
-  background: #007c87;
+.sidebar.open {
+  left: 0; /* Sidebar slides into view */
 }
 
-.secondary-btn:hover {
-  background: #d43d3d;
+.sidebar a {
+  display: block;
+  padding: 15px 20px;
+  text-decoration: none;
+  color: white;
+  font-size: 1.2rem;
+  transition: background 0.3s ease;
+}
+
+.sidebar a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Sidebar Toggle Button */
+.menu-btn {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 10px 15px;
+  transition: transform 0.3s ease;
+}
+
+.menu-btn:hover {
+  transform: scale(1.1);
 }
