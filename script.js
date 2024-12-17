@@ -1,136 +1,74 @@
-// State
-const state = {
-    contributions: [], // Stores all contributions
-    expenses: [],      // Stores all expenses
-};
+// Global State
+let contributions = [];
+let expenses = [];
+let walletBalance = 0;
+let walletHistory = [];
 
-// DOM Elements
-const totalRentCollected = document.getElementById("totalRentCollected");
-const totalExpenses = document.getElementById("totalExpenses");
-const remainingBalance = document.getElementById("remainingBalance");
-const rentCollectedCard = document.getElementById("rentCollectedCard");
-const expensesCard = document.getElementById("expensesCard");
-const historyModal = document.getElementById("historyModal");
-const historyList = document.getElementById("historyList");
-const closeModalButton = document.getElementById("closeModal");
+// Tab Switching Logic
+document.querySelectorAll(".tab-button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-content").forEach((tab) => tab.classList.remove("active"));
+        document.querySelectorAll(".tab-button").forEach((b) => b.classList.remove("active"));
+        const targetTab = btn.dataset.target;
+        document.getElementById(targetTab).classList.add("active");
+        btn.classList.add("active");
+    });
+});
 
-// Add Rent Contribution
+// Add Contribution
 document.getElementById("addContributionButton").addEventListener("click", () => {
     const name = document.getElementById("contributorName").value.trim();
     const amount = parseFloat(document.getElementById("contributionAmount").value);
 
-    if (!name || isNaN(amount) || amount <= 0) {
-        alert("Please enter valid contribution details!");
-        return;
+    if (name && amount > 0) {
+        contributions.push({ name, amount, date: new Date().toLocaleString() });
+        updateHistory("contributionHistory", contributions);
     }
-
-    // Add to state
-    state.contributions.push({ name, amount, date: new Date().toLocaleDateString() });
-
-    // Update UI
-    updateSummary();
-    resetForm(["contributorName", "contributionAmount"]);
-    alert("Contribution added!");
 });
 
 // Add Expense
 document.getElementById("addExpenseButton").addEventListener("click", () => {
     const name = document.getElementById("expenseName").value.trim();
     const amount = parseFloat(document.getElementById("expenseAmount").value);
-    const receipt = document.getElementById("expenseReceipt").files[0];
+    const description = document.getElementById("expenseDescription").value.trim();
 
-    if (!name || isNaN(amount) || amount <= 0) {
-        alert("Please enter valid expense details!");
-        return;
+    if (name && amount > 0) {
+        expenses.push({ name, amount, description, date: new Date().toLocaleString() });
+        updateHistory("expenseHistory", expenses);
     }
-
-    const receiptURL = receipt ? URL.createObjectURL(receipt) : null;
-
-    // Add to state
-    state.expenses.push({ name, amount, receiptURL, date: new Date().toLocaleDateString() });
-
-    // Update UI
-    updateSummary();
-    resetForm(["expenseName", "expenseAmount", "expenseReceipt"]);
-    alert("Expense added!");
 });
 
-// Update Summary
-function updateSummary() {
-    const totalRent = state.contributions.reduce((sum, c) => sum + c.amount, 0);
-    const totalExpense = state.expenses.reduce((sum, e) => sum + e.amount, 0);
-    const remaining = totalRent - totalExpense;
-
-    // Update DOM
-    totalRentCollected.textContent = totalRent.toFixed(2);
-    totalExpenses.textContent = totalExpense.toFixed(2);
-    remainingBalance.textContent = remaining.toFixed(2);
-
-    // Animate changes
-    animateHighlight([totalRentCollected, totalExpenses, remainingBalance]);
-}
-
-// Animate Highlight
-function animateHighlight(elements) {
-    elements.forEach((el) => {
-        el.classList.add("highlight");
-        setTimeout(() => el.classList.remove("highlight"), 500);
-    });
-}
-
-// View Rent History
-rentCollectedCard.addEventListener("click", () => {
-    displayHistory(state.contributions, "Rent Contributions");
-    historyModal.classList.add("show");
-});
-
-// View Expense History
-expensesCard.addEventListener("click", () => {
-    displayHistory(state.expenses, "Expense History");
-    historyModal.classList.add("show");
-});
-
-// Display History
-function displayHistory(data, title) {
-    document.getElementById("modalTitle").textContent = title;
-    historyList.innerHTML = "";
-
-    if (data.length === 0) {
-        historyList.innerHTML = "<li>No records available</li>";
-    } else {
-        data.forEach((item) => {
-            const li = document.createElement("li");
-            li.innerHTML = `
-                ${item.name} - £${item.amount} (${item.date})
-                ${
-                    item.receiptURL
-                        ? `<a href="${item.receiptURL}" target="_blank">View Receipt</a>`
-                        : ""
-                }
-            `;
-            historyList.appendChild(li);
-        });
+// Add Money to Wallet
+document.getElementById("addWalletButton").addEventListener("click", () => {
+    const amount = parseFloat(document.getElementById("walletAmount").value);
+    if (amount > 0) {
+        walletBalance += amount;
+        walletHistory.push({ action: "Added", amount, date: new Date().toLocaleString() });
+        updateWallet();
     }
-}
-
-// Close Modal
-closeModalButton.addEventListener("click", () => historyModal.classList.remove("show"));
-historyModal.addEventListener("click", (e) => {
-    if (e.target === historyModal) historyModal.classList.remove("show");
 });
 
-// Reset Form
-function resetForm(fields) {
-    fields.forEach((id) => {
-        const field = document.getElementById(id);
-        if (field.type === "file") field.value = null;
-        else field.value = "";
-    });
-}
-// Sidebar Toggle
-const sidebar = document.getElementById("sidebar");
-const toggleSidebarButton = document.getElementById("toggleSidebar");
+// Send Money
+document.getElementById("sendMoneyButton").addEventListener("click", () => {
+    const recipient = document.getElementById("recipientName").value.trim();
+    const amount = parseFloat(document.getElementById("sendAmount").value);
 
-toggleSidebarButton.addEventListener("click", () => {
-    sidebar.classList.toggle("open");
+    if (recipient && amount > 0 && amount <= walletBalance) {
+        walletBalance -= amount;
+        walletHistory.push({ action: `Sent to ${recipient}`, amount, date: new Date().toLocaleString() });
+        updateWallet();
+    }
 });
+
+function updateHistory(id, data) {
+    document.getElementById(id).innerHTML = data
+        .map((item) => `<li>${item.name}: £${item.amount} (${item.date})</li>`)
+        .join("");
+}
+
+function updateWallet() {
+    document.getElementById("walletBalance").textContent = walletBalance.toFixed(2);
+    document.getElementById("walletHistory").innerHTML = walletHistory
+        .map((item) => `<li>${item.action}: £${item.amount} on ${item.date}</li>`)
+        .join("");
+}
