@@ -11,17 +11,62 @@
     <!-- Navigation Bar -->
     <header class="navbar">
         <div class="logo">NoteBudget🏠</div>
-        <nav>
-            <button class="tab-button active" data-target="contributionTab">Contributions</button>
+        <nav id="mainNav" class="hidden">
+            <button class="tab-button active" data-target="dashboardTab">Dashboard</button>
+            <button class="tab-button" data-target="contributionTab">Transactions</button>
             <button class="tab-button" data-target="walletTab">Wallet</button>
         </nav>
+        <div id="userInfo" class="user-info"></div>
+        <button id="themeToggle" class="theme-toggle">
+            <span class="theme-toggle-dark">🌙</span>
+            <span class="theme-toggle-light">☀️</span>
+        </button>
     </header>
 
+    <!-- Auth Section -->
+    <section id="authSection" class="auth-container hidden">
+        <div class="auth-card">
+            <h1>Welcome to NoteBudget</h1>
+            <p>Please login to continue</p>
+            <button onclick="window.location.href='login.html'" class="auth-button">Login</button>
+            <p class="auth-links">
+                <a href="register.html">Create Account</a>
+            </p>
+        </div>
+    </section>
+
     <!-- Tabs Content -->
-    <main>
+    <main id="mainContent" class="hidden">
+        <!-- Dashboard Tab -->
+        <section id="dashboardTab" class="tab-content active fade-in">
+            <h1>Dashboard</h1>
+            
+            <div class="dashboard-grid">
+                <div class="card summary-card">
+                    <h2>Total Contributions</h2>
+                    <p class="amount" id="totalContributions">£0.00</p>
+                </div>
+                
+                <div class="card summary-card">
+                    <h2>Total Expenses</h2>
+                    <p class="amount" id="totalExpenses">£0.00</p>
+                </div>
+                
+                <div class="card summary-card">
+                    <h2>Net Balance</h2>
+                    <p class="amount" id="netBalance">£0.00</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Recent Transactions</h2>
+                <ul id="recentTransactions" class="transaction-list"></ul>
+            </div>
+        </section>
+
         <!-- Contribution Tab -->
-        <section id="contributionTab" class="tab-content active fade-in">
-            <h1>Contributions</h1>
+        <section id="contributionTab" class="tab-content fade-in">
+            <h1>Transactions</h1>
 
             <!-- Add Contribution -->
             <div class="card glass-card">
@@ -53,7 +98,7 @@
         </section>
 
         <!-- Wallet Tab -->
-        <section id="walletTab" class="tab-content fade-in hidden">
+        <section id="walletTab" class="tab-content fade-in">
             <h1>Wallet</h1>
 
             <!-- Wallet Balance -->
@@ -72,10 +117,35 @@
                 <button id="sendMoneyButton" class="btn secondary-btn">Send Money</button>
             </div>
 
+            <!-- Transaction Filters -->
+            <div class="card filter-card">
+                <h2>Transaction Filters</h2>
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <input type="text" id="transactionSearch" placeholder="Search transactions...">
+                    </div>
+                    <div class="filter-group">
+                        <select id="transactionType">
+                            <option value="">All Types</option>
+                            <option value="add">Added Money</option>
+                            <option value="send">Sent Money</option>
+                        </select>
+                    </div>
+                    <div class="filter-group date-filters">
+                        <input type="date" id="dateFrom" placeholder="From Date">
+                        <input type="date" id="dateTo" placeholder="To Date">
+                    </div>
+                    <button onclick="transactionManager.exportTransactions('csv')" class="export-btn">
+                        Export to CSV 📥
+                    </button>
+                </div>
+            </div>
+
             <!-- Wallet Transaction History -->
             <div class="card history-card">
                 <h2>Wallet Transaction History</h2>
-                <ul id="walletHistory"></ul>
+                <ul id="walletHistory" class="transaction-list"></ul>
+                <div id="transactionPagination" class="pagination"></div>
             </div>
 
             <!-- Virtual ATM Card -->
@@ -85,20 +155,17 @@
                         <div class="card-chip"></div>
                         <div class="card-logo">Virtual Wallet</div>
                         <div class="card-details">
-                            <div class="card-number">**** **** **** 1234</div>
-                            <div class="card-info">
-                                <div class="card-holder">
-                                    <span class="label">CARD HOLDER</span>
-                                    <span class="value" id="cardHolderName">YOUR NAME</span>
-                                </div>
-                                <div class="card-expiry">
-                                    <span class="label">EXPIRY</span>
-                                    <span class="value">12/25</span>
-                                </div>
-                                <div class="card-balance">
-                                    <span class="label">BALANCE</span>
-                                    <span class="value" id="cardBalance">£0.00</span>
-                                </div>
+                            <div class="card-holder">
+                                <span class="label">CARD HOLDER</span>
+                                <span class="value" id="cardHolderName">YOUR NAME</span>
+                            </div>
+                            <div class="card-expiry">
+                                <span class="label">EXPIRY</span>
+                                <span class="value">12/25</span>
+                            </div>
+                            <div class="card-balance">
+                                <span class="label">BALANCE</span>
+                                <span class="value" id="cardBalance">£0.00</span>
                             </div>
                         </div>
                     </div>
@@ -117,6 +184,19 @@
     </main>
 
     <!-- JavaScript -->
+    <script src="auth.js"></script>
     <script src="script.js"></script>
+    <script src="transactions.js"></script>
+    <script>
+        // Initialize authentication on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initAuth();
+            // If no user is logged in, show auth section
+            if (!localStorage.getItem('currentUser')) {
+                document.getElementById('authSection').classList.remove('hidden');
+                document.getElementById('mainContent').classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 </html>

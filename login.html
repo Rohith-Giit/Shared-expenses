@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - NoteBudget🏠</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1>Welcome Back</h1>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="auth-button">Login</button>
+            </form>
+            <p class="auth-links">
+                <a href="#" id="forgotPassword">Forgot Password?</a>
+                <a href="register.html">Create Account</a>
+            </p>
+            <p class="back-link">
+                <a href="index.html">← Back to Home</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        // Check if user is already logged in
+        if (localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const loginButton = e.target.querySelector('button');
+                loginButton.disabled = true;
+                loginButton.textContent = 'Logging in...';
+                
+                await login(email, password);
+                window.location.href = 'index.html';
+            } catch (error) {
+                showError('Invalid email or password');
+                const loginButton = e.target.querySelector('button');
+                loginButton.disabled = false;
+                loginButton.textContent = 'Login';
+            }
+        });
+
+        // Prevent form resubmission on page refresh
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
+</body>
+</html> 
