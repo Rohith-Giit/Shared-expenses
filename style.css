@@ -939,3 +939,51 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* Login Method Selector */
+.login-method-selector {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.method-btn {
+    flex: 1;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.method-btn.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: #6dd5ed;
+}
+
+.method-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Unique Code Input */
+#uniqueCode {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.auth-button.secondary {
+    background: transparent;
+    border: 1px solid #6dd5ed;
+    margin-top: 0.5rem;
+}
+
+.auth-button.secondary:hover {
+    background: rgba(109, 213, 237, 0.1);
+}

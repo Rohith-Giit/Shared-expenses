@@ -20,6 +20,7 @@ class User {
         this.name = name;
         this.id = `user_${Date.now()}`;
         this.createdAt = new Date().toISOString();
+        this.uniqueCode = null;
         this.preferences = {
             theme: 'light',
             currency: 'GBP'
@@ -211,4 +212,76 @@ function paginateTransactions(transactions, page = 1, perPage = 10) {
         currentPage: page,
         totalPages: Math.ceil(transactions.length / perPage)
     };
+}
+
+// Login with Email
+function loginWithEmail(email, password) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            try {
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                const user = Object.values(users).find(u => u.email === email);
+                
+                if (user) {
+                    currentUser = user;
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    updateAuthUI();
+                    resolve(user);
+                } else {
+                    // Create new user if not exists
+                    const newUser = new User(email, email.split('@')[0]);
+                    currentUser = newUser;
+                    saveUserData(newUser);
+                    localStorage.setItem('currentUser', JSON.stringify(newUser));
+                    updateAuthUI();
+                    resolve(newUser);
+                }
+            } catch (error) {
+                reject(error);
+            }
+        }, 1000);
+    });
+}
+
+// Login with Code
+function loginWithCode(code) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            try {
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                const user = Object.values(users).find(u => u.uniqueCode === code.toUpperCase());
+                
+                if (user) {
+                    currentUser = user;
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    updateAuthUI();
+                    resolve(user);
+                } else {
+                    // Create new user with code
+                    const newUser = new User(null, `User_${code}`);
+                    newUser.uniqueCode = code.toUpperCase();
+                    currentUser = newUser;
+                    saveUserData(newUser);
+                    localStorage.setItem('currentUser', JSON.stringify(newUser));
+                    updateAuthUI();
+                    resolve(newUser);
+                }
+            } catch (error) {
+                reject(error);
+            }
+        }, 1000);
+    });
+}
+
+// Generate Unique Code
+function generateUniqueCode() {
+    return new Promise((resolve, reject) => {
+        try {
+            const code = Math.random().toString(36).substring(2, 6).toUpperCase() + 
+                        Math.random().toString(36).substring(2, 6).toUpperCase();
+            resolve(code);
+        } catch (error) {
+            reject(error);
+        }
+    });
 }

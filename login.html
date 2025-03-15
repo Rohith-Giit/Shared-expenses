@@ -11,7 +11,15 @@
     <div class="auth-container">
         <div class="auth-card">
             <h1>Welcome Back</h1>
-            <form id="loginForm" class="auth-form">
+            
+            <!-- Login Method Selector -->
+            <div class="login-method-selector">
+                <button class="method-btn active" data-method="email">Email Login</button>
+                <button class="method-btn" data-method="code">Unique Code</button>
+            </div>
+
+            <!-- Email Login Form -->
+            <form id="emailLoginForm" class="auth-form">
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" required placeholder="Enter your email">
@@ -20,8 +28,21 @@
                     <label for="password">Password</label>
                     <input type="password" id="password" required placeholder="Enter your password">
                 </div>
-                <button type="submit" class="auth-button">Login</button>
+                <button type="submit" class="auth-button">Login with Email</button>
             </form>
+
+            <!-- Unique Code Form -->
+            <form id="codeLoginForm" class="auth-form hidden">
+                <div class="form-group">
+                    <label for="uniqueCode">Unique Code</label>
+                    <input type="text" id="uniqueCode" placeholder="Enter your unique code" maxlength="8">
+                </div>
+                <button type="submit" class="auth-button">Continue with Code</button>
+                <button type="button" class="auth-button secondary" id="generateCodeBtn">
+                    Generate New Code
+                </button>
+            </form>
+
             <p class="auth-links">
                 <a href="#" id="forgotPassword">Forgot Password?</a>
                 <a href="register.html">Create Account</a>
@@ -39,7 +60,28 @@
             window.location.href = 'index.html';
         }
 
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        // Login Method Switching
+        const methodBtns = document.querySelectorAll('.method-btn');
+        const emailForm = document.getElementById('emailLoginForm');
+        const codeForm = document.getElementById('codeLoginForm');
+
+        methodBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                methodBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                if (btn.dataset.method === 'email') {
+                    emailForm.classList.remove('hidden');
+                    codeForm.classList.add('hidden');
+                } else {
+                    emailForm.classList.add('hidden');
+                    codeForm.classList.remove('hidden');
+                }
+            });
+        });
+
+        // Email Login
+        emailForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -49,17 +91,47 @@
                 loginButton.disabled = true;
                 loginButton.textContent = 'Logging in...';
                 
-                await login(email, password);
+                await loginWithEmail(email, password);
                 window.location.href = 'index.html';
             } catch (error) {
                 showError('Invalid email or password');
                 const loginButton = e.target.querySelector('button');
                 loginButton.disabled = false;
-                loginButton.textContent = 'Login';
+                loginButton.textContent = 'Login with Email';
             }
         });
 
-        // Prevent form resubmission on page refresh
+        // Code Login
+        codeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const code = document.getElementById('uniqueCode').value;
+            
+            try {
+                const loginButton = e.target.querySelector('button');
+                loginButton.disabled = true;
+                loginButton.textContent = 'Verifying...';
+                
+                await loginWithCode(code);
+                window.location.href = 'index.html';
+            } catch (error) {
+                showError('Invalid code');
+                loginButton.disabled = false;
+                loginButton.textContent = 'Continue with Code';
+            }
+        });
+
+        // Generate New Code
+        document.getElementById('generateCodeBtn').addEventListener('click', async () => {
+            try {
+                const code = await generateUniqueCode();
+                document.getElementById('uniqueCode').value = code;
+                showSuccess('New code generated! Save this code for future logins.');
+            } catch (error) {
+                showError('Failed to generate code');
+            }
+        });
+
+        // Prevent form resubmission
         if (window.history.replaceState) {
             window.history.replaceState(null, null, window.location.href);
         }
