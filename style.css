@@ -1464,9 +1464,7 @@ main {
 .card-brand {
     font-size: 1.8rem;
     font-weight: 700;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 0.5rem 1.2rem;
-    border-radius: 8px;
+    color: white;
 }
 
 .mastercard-logo {
