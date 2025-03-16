@@ -248,19 +248,28 @@ function loginWithCode(code) {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             try {
+                if (!code) {
+                    reject(new Error('Please enter a code'));
+                    return;
+                }
+
+                const formattedCode = code.trim().toUpperCase();
                 const users = JSON.parse(localStorage.getItem('users') || '{}');
-                const user = Object.values(users).find(u => u.uniqueCode === code.toUpperCase());
+                const user = Object.values(users).find(u => u.uniqueCode === formattedCode);
                 
                 if (user) {
+                    // Existing user - load their data
                     currentUser = user;
                     localStorage.setItem('currentUser', JSON.stringify(user));
                     updateAuthUI();
                     resolve(user);
                 } else {
                     // Create new user with code
-                    const newUser = new User(null, `User_${code}`);
-                    newUser.uniqueCode = code.toUpperCase();
+                    const newUser = new User(null, `User_${formattedCode}`);
+                    newUser.uniqueCode = formattedCode;
                     currentUser = newUser;
+                    
+                    // Save to users storage
                     saveUserData(newUser);
                     localStorage.setItem('currentUser', JSON.stringify(newUser));
                     updateAuthUI();
@@ -277,11 +286,42 @@ function loginWithCode(code) {
 function generateUniqueCode() {
     return new Promise((resolve, reject) => {
         try {
-            const code = Math.random().toString(36).substring(2, 6).toUpperCase() + 
-                        Math.random().toString(36).substring(2, 6).toUpperCase();
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            let code;
+            let isUnique = false;
+
+            // Keep generating until we find a unique code
+            while (!isUnique) {
+                code = Math.random().toString(36).substring(2, 6).toUpperCase() + 
+                       Math.random().toString(36).substring(2, 6).toUpperCase();
+                isUnique = !Object.values(users).some(user => user.uniqueCode === code);
+            }
+
+            // Create a new user with this code
+            const newUser = new User(null, `User_${code}`);
+            newUser.uniqueCode = code;
+            
+            // Save the new user
+            saveUserData(newUser);
+            
             resolve(code);
         } catch (error) {
             reject(error);
         }
     });
+}
+
+// Add function to sync user data across devices
+function syncUserData() {
+    if (currentUser?.uniqueCode) {
+        const users = JSON.parse(localStorage.getItem('users') || '{}');
+        const latestUserData = Object.values(users).find(u => u.uniqueCode === currentUser.uniqueCode);
+        
+        if (latestUserData) {
+            currentUser = latestUserData;
+            localStorage.setItem('currentUser', JSON.stringify(latestUserData));
+            return true;
+        }
+    }
+    return false;
 }

@@ -23,6 +23,26 @@
         </button>
     </header>
 
+    <!-- Add this after the navbar -->
+    <div class="app-shortcuts">
+        <a href="#" class="app-shortcut" onclick="switchTab('dashboardTab')">
+            <div class="app-icon" style="background: #4285F4; color: white;">📊</div>
+            <span class="app-name">Dashboard</span>
+        </a>
+        <a href="#" class="app-shortcut" onclick="switchTab('walletTab')">
+            <div class="app-icon" style="background: #34A853; color: white;">💰</div>
+            <span class="app-name">Wallet</span>
+        </a>
+        <a href="#" class="app-shortcut" onclick="switchTab('contributionTab')">
+            <div class="app-icon" style="background: #FBBC05; color: white;">💸</div>
+            <span class="app-name">Transactions</span>
+        </a>
+        <a href="#" class="app-shortcut" onclick="exportAllData()">
+            <div class="app-icon" style="background: #EA4335; color: white;">📤</div>
+            <span class="app-name">Export</span>
+        </a>
+    </div>
+
     <!-- Auth Section -->
     <section id="authSection" class="auth-container hidden">
         <div class="auth-card">
@@ -82,6 +102,24 @@
                 <input type="text" id="expenseName" placeholder="Expense Name">
                 <input type="number" id="expenseAmount" placeholder="Amount (£)">
                 <textarea id="expenseDescription" placeholder="Description"></textarea>
+                
+                <!-- Add Image Upload Section -->
+                <div class="upload-container" id="uploadContainer">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">Add Receipt or Image</div>
+                    <div id="imagePreview" class="upload-preview"></div>
+                    
+                    <div class="upload-actions">
+                        <label for="expenseImage" class="upload-btn">
+                            <span>📄</span> Choose File
+                        </label>
+                        <button id="captureBtn" class="upload-btn camera-btn">
+                            <span>📸</span> Take Photo
+                        </button>
+                    </div>
+                    <input type="file" id="expenseImage" accept="image/*" multiple style="display: none">
+                </div>
+                
                 <button id="addExpenseButton" class="btn secondary-btn">Add Expense</button>
             </div>
 
@@ -143,41 +181,73 @@
 
             <!-- Wallet Transaction History -->
             <div class="card history-card">
-                <h2>Wallet Transaction History</h2>
-                <ul id="walletHistory" class="transaction-list"></ul>
+                <h2>History</h2>
+                
+                <div class="transaction-search-container">
+                    <div class="transaction-search">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="transactionSearch" placeholder="Search transactions">
+                        <button class="filter-icon">⚙️</button>
+                    </div>
+                </div>
+                
+                <ul id="walletHistory" class="transaction-list-modern"></ul>
                 <div id="transactionPagination" class="pagination"></div>
             </div>
 
-            <!-- Virtual ATM Card -->
-            <div class="atm-card-container">
-                <div class="atm-card">
-                    <div class="card-side card-front">
-                        <div class="card-chip"></div>
-                        <div class="card-logo">Virtual Wallet</div>
-                        <div class="card-details">
-                            <div class="card-holder">
-                                <span class="label">CARD HOLDER</span>
-                                <span class="value" id="cardHolderName">YOUR NAME</span>
-                            </div>
-                            <div class="card-expiry">
-                                <span class="label">EXPIRY</span>
-                                <span class="value">12/25</span>
-                            </div>
-                            <div class="card-balance">
-                                <span class="label">BALANCE</span>
-                                <span class="value" id="cardBalance">£0.00</span>
+            <!-- Add this in the Wallet section before the ATM card container -->
+            <div class="card-toggle-container">
+                <button id="cardToggleBtn" class="card-toggle-btn">
+                    <span class="card-icon">💳</span>
+                    <span>View Card</span>
+                </button>
+            </div>
+
+            <!-- Replace the ATM card container with this updated design -->
+            <div id="modernCardView" class="modern-card-view">
+                <div class="modern-card">
+                    <div class="card-top">
+                        <div class="virtual-badge">Virtual</div>
+                    </div>
+                    <div class="card-middle">
+                        <div class="card-holder-name" id="modernCardName">Rohith Daripelly</div>
+                    </div>
+                    <div class="card-bottom">
+                        <div class="card-brand">Note Budget</div>
+                        <div class="card-logo">
+                            <div class="mastercard-logo">
+                                <div class="circle circle-red"></div>
+                                <div class="circle circle-orange"></div>
                             </div>
                         </div>
                     </div>
-                    <div class="card-side card-back">
-                        <div class="card-cvv">
-                            <span class="label">CVV</span>
-                            <span class="value">123</span>
-                        </div>
-                        <div class="support-info">
-                            <span>Support: 1-800-555-0199</span>
-                        </div>
-                    </div>
+                </div>
+                
+                <div class="card-actions">
+                    <button class="action-btn" id="showDetailsBtn">
+                        <div class="action-icon">👁️</div>
+                        <div class="action-text">Show details</div>
+                    </button>
+                    <button class="action-btn" id="freezeCardBtn">
+                        <div class="action-icon">❄️</div>
+                        <div class="action-text">Freeze</div>
+                    </button>
+                    <button class="action-btn" id="cardSettingsBtn">
+                        <div class="action-icon">⚙️</div>
+                        <div class="action-text">Settings</div>
+                    </button>
+                </div>
+                
+                <div class="no-transactions">
+                    <div class="no-tx-icon">🔄</div>
+                    <div class="no-tx-text">No transactions yet</div>
+                </div>
+                
+                <div class="add-to-wallet">
+                    <button class="add-to-wallet-btn">
+                        <span class="wallet-icon">📱</span>
+                        Add to Apple Wallet
+                    </button>
                 </div>
             </div>
         </section>
@@ -197,6 +267,61 @@
                 document.getElementById('mainContent').classList.add('hidden');
             }
         });
+    </script>
+
+    <!-- Add this right before the closing </body> tag -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Card toggle functionality - simplified approach
+        const cardBtn = document.getElementById('cardToggleBtn');
+        if (cardBtn) {
+            cardBtn.addEventListener('click', function() {
+                const cardView = document.getElementById('modernCardView');
+                if (cardView) {
+                    // Toggle class instead of style
+                    cardView.classList.toggle('show-card');
+                    
+                    // Update button text
+                    const btnText = cardView.classList.contains('show-card') ? 'Hide Card' : 'View Card';
+                    this.querySelector('span:last-child').textContent = btnText;
+                }
+            });
+        }
+    });
+    </script>
+
+    <!-- Add this right before the closing </body> tag -->
+    <script>
+    // Script to update card number
+    (function() {
+        // Function to set the card number
+        function setCardNumber() {
+            const cardLastDigits = document.getElementById('cardLastDigits');
+            if (cardLastDigits) {
+                console.log('Setting card number to 0000');
+                cardLastDigits.textContent = '0000';
+                localStorage.setItem('cardLastDigits', '0000');
+                return true;
+            }
+            return false;
+        }
+        
+        // Try immediately after DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!setCardNumber()) {
+                // If it fails, try again after a delay
+                setTimeout(setCardNumber, 500);
+            }
+        });
+        
+        // Also try after the window has fully loaded (images and all)
+        window.addEventListener('load', function() {
+            setCardNumber();
+        });
+        
+        // Try right now in case the DOM is already loaded
+        setCardNumber();
+    })();
     </script>
 </body>
 </html>

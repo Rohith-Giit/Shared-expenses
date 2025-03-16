@@ -3,6 +3,10 @@ let contributions = [];
 let expenses = [];
 let walletBalance = 0;
 let walletHistory = [];
+let syncInterval;
+
+// Store uploaded images
+let uploadedFiles = [];
 
 // Load data from localStorage
 function loadWalletData() {
@@ -66,14 +70,29 @@ document.getElementById("addExpenseButton").addEventListener("click", () => {
     const description = document.getElementById("expenseDescription").value.trim();
 
     if (name && amount > 0) {
-        expenses.push({ name, amount, description, date: new Date().toLocaleString() });
+        // Create expense object with images
+        const expenseItem = { 
+            name, 
+            amount, 
+            description, 
+            date: new Date().toLocaleString(),
+            images: uploadedFiles.slice() // Copy the uploaded images
+        };
+        
+        expenses.push(expenseItem);
         updateHistory("expenseHistory", expenses);
         updateDashboard();
         
-        // Clear inputs
+        // Clear inputs and preview
         document.getElementById("expenseName").value = '';
         document.getElementById("expenseAmount").value = '';
         document.getElementById("expenseDescription").value = '';
+        document.getElementById("imagePreview").innerHTML = '';
+        uploadedFiles = [];
+        
+        showSuccess("Expense added successfully!");
+    } else {
+        showError("Please enter a name and valid amount");
     }
 });
 
@@ -377,15 +396,20 @@ function showError(message) {
 }
 
 function showSuccess(message) {
-    const successDiv = document.createElement('div');
-    successDiv.className = 'message success-message';
-    successDiv.textContent = message;
-    document.body.appendChild(successDiv);
+    const successToast = document.createElement('div');
+    successToast.className = 'toast success-toast';
+    successToast.textContent = message;
+    document.body.appendChild(successToast);
     
     setTimeout(() => {
-        successDiv.classList.add('fade-out');
-        setTimeout(() => successDiv.remove(), 500);
-    }, 3000);
+        successToast.classList.add('show');
+        setTimeout(() => {
+            successToast.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(successToast);
+            }, 300);
+        }, 3000);
+    }, 100);
 }
 
 // Dashboard Updates
@@ -459,6 +483,153 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+
+    // Setup periodic sync for user data
+    if (currentUser) {
+        syncInterval = setInterval(() => {
+            if (syncUserData()) {
+                // Update UI if data was synced
+                updateWalletUI();
+                if (transactionManager) {
+                    transactionManager.updateTransactionList();
+                }
+            }
+        }, 30000); // Sync every 30 seconds
+    }
+
+    // Initialize file upload
+    const fileInput = document.getElementById('expenseImage');
+    const uploadContainer = document.getElementById('uploadContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const captureBtn = document.getElementById('captureBtn');
+
+    if (fileInput && uploadContainer) {
+        // Handle drag and drop
+        uploadContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadContainer.classList.add('dragover');
+        });
+
+        uploadContainer.addEventListener('dragleave', () => {
+            uploadContainer.classList.remove('dragover');
+        });
+
+        uploadContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadContainer.classList.remove('dragover');
+            
+            if (e.dataTransfer.files.length) {
+                handleFiles(e.dataTransfer.files);
+            }
+        });
+
+        // Handle file input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFiles(e.target.files);
+            }
+        });
+
+        // Handle click on container to open file dialog
+        uploadContainer.addEventListener('click', (e) => {
+            if (e.target !== fileInput) {
+                fileInput.click();
+            }
+        });
+
+        // Camera capture
+        if (captureBtn) {
+            captureBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent container click
+                openCamera();
+            });
+        }
+    }
+
+    // Directly manipulate the card view when the page loads
+    window.addEventListener('load', function() {
+        // Get card elements
+        const cardToggleBtn = document.getElementById('cardToggleBtn');
+        const modernCardView = document.getElementById('modernCardView');
+        
+        if (!cardToggleBtn || !modernCardView) {
+            console.error('Card elements not found:', {
+                toggleBtn: !!cardToggleBtn,
+                cardView: !!modernCardView
+            });
+            return;
+        }
+        
+        console.log('Card elements found successfully');
+        
+        // Explicitly set initial style
+        modernCardView.style.display = 'none';
+        
+        // Simple toggle function
+        function toggleCardView() {
+            console.log('Toggle button clicked!');
+            console.log('Current display style:', modernCardView.style.display);
+            
+            if (modernCardView.style.display === 'none' || modernCardView.style.display === '') {
+                modernCardView.style.display = 'flex';
+                cardToggleBtn.querySelector('span:last-child').textContent = 'Hide Card';
+                console.log('Card should be visible now');
+            } else {
+                modernCardView.style.display = 'none';
+                cardToggleBtn.querySelector('span:last-child').textContent = 'View Card';
+                console.log('Card should be hidden now');
+            }
+        }
+        
+        // Remove any existing click handlers to avoid duplicates
+        cardToggleBtn.removeEventListener('click', toggleCardView);
+        
+        // Add the click handler
+        cardToggleBtn.addEventListener('click', toggleCardView);
+        console.log('Click handler attached to card toggle button');
+        
+        // Setup the card action buttons
+        const showDetailsBtn = document.getElementById('showDetailsBtn');
+        const freezeCardBtn = document.getElementById('freezeCardBtn');
+        const cardSettingsBtn = document.getElementById('cardSettingsBtn');
+        
+        if (showDetailsBtn) {
+            showDetailsBtn.addEventListener('click', function() {
+                alert('Card Details: This is a virtual card for NoteBudget app');
+            });
+        }
+        
+        if (freezeCardBtn) {
+            freezeCardBtn.addEventListener('click', function() {
+                const isFrozen = this.getAttribute('data-frozen') === 'true';
+                if (isFrozen) {
+                    this.setAttribute('data-frozen', 'false');
+                    this.querySelector('.action-icon').textContent = '❄️';
+                    this.querySelector('.action-text').textContent = 'Freeze';
+                    showSuccess('Card unfrozen successfully');
+                } else {
+                    this.setAttribute('data-frozen', 'true');
+                    this.querySelector('.action-icon').textContent = '🔥';
+                    this.querySelector('.action-text').textContent = 'Unfreeze';
+                    showSuccess('Card frozen successfully');
+                }
+            });
+        }
+        
+        if (cardSettingsBtn) {
+            cardSettingsBtn.addEventListener('click', function() {
+                alert('Card Settings: You can manage your card settings here');
+            });
+        }
+    });
+
+    // Force specific card number to match design
+    const cardLastDigits = document.getElementById('cardLastDigits');
+    if (cardLastDigits) {
+        // Set to exactly 0000
+        cardLastDigits.textContent = '0000';
+        localStorage.setItem('cardLastDigits', '0000');
+    }
 });
 
 // Update the wallet UI function
@@ -476,4 +647,266 @@ function updateWalletUI() {
             cardBalanceElement.textContent = `£${value.toFixed(2)}`;
         }
     );
+}
+
+// Clean up on logout
+function logout() {
+    clearInterval(syncInterval);
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    window.location.href = 'login.html';
+}
+
+// Function to switch tabs via app shortcuts
+function switchTab(tabId) {
+    // Remove active class from all tabs and buttons
+    document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+    document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
+    
+    // Add active class to selected tab
+    document.getElementById(tabId).classList.add("active");
+    
+    // Find and activate the corresponding button
+    document.querySelector(`[data-target="${tabId}"]`).classList.add("active");
+    
+    // Make sure the tab content is visible
+    document.getElementById(tabId).classList.remove("hidden");
+}
+
+// Export all data function
+function exportAllData() {
+    if (transactionManager) {
+        transactionManager.exportTransactions('csv');
+    } else {
+        showError('No transaction data available');
+    }
+}
+
+// Function to handle files
+function handleFiles(files) {
+    const imagePreview = document.getElementById('imagePreview');
+    
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Check if it's an image
+        if (!file.type.match('image.*')) {
+            continue;
+        }
+        
+        // Add to uploaded files array
+        uploadedFiles.push(file);
+        
+        // Create preview
+        const reader = new FileReader();
+        reader.onload = (function(theFile) {
+            return function(e) {
+                // Create preview item
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                
+                // Create image
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.title = theFile.name;
+                
+                // Create remove button
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-image';
+                removeBtn.innerHTML = '×';
+                removeBtn.addEventListener('click', function(evt) {
+                    evt.stopPropagation();
+                    const index = uploadedFiles.indexOf(theFile);
+                    if (index > -1) {
+                        uploadedFiles.splice(index, 1);
+                    }
+                    previewItem.remove();
+                });
+                
+                previewItem.appendChild(img);
+                previewItem.appendChild(removeBtn);
+                imagePreview.appendChild(previewItem);
+            };
+        })(file);
+        
+        reader.readAsDataURL(file);
+    }
+}
+
+// Function to open the camera
+function openCamera() {
+    // Check if the camera modal already exists
+    let cameraModal = document.getElementById('cameraModal');
+    
+    if (!cameraModal) {
+        // Create the camera modal
+        cameraModal = document.createElement('div');
+        cameraModal.id = 'cameraModal';
+        cameraModal.className = 'modal';
+        cameraModal.innerHTML = `
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Take a Photo</h2>
+                <video id="cameraPreview" autoplay></video>
+                <div class="camera-controls">
+                    <button id="takePictureBtn">📸 Capture</button>
+                    <button id="closeCameraBtn">Cancel</button>
+                </div>
+                <canvas id="captureCanvas" style="display:none;"></canvas>
+            </div>
+        `;
+        document.body.appendChild(cameraModal);
+        
+        // Add CSS for the modal
+        const style = document.createElement('style');
+        style.textContent = `
+            .modal {
+                display: block;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.7);
+            }
+            .modal-content {
+                background-color: white;
+                margin: 5% auto;
+                padding: 20px;
+                border-radius: 15px;
+                width: 90%;
+                max-width: 600px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            }
+            .close-modal {
+                color: #aaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            .close-modal:hover {
+                color: black;
+            }
+            #cameraPreview {
+                width: 100%;
+                max-height: 400px;
+                background-color: #f0f0f0;
+                margin: 15px 0;
+                border-radius: 8px;
+            }
+            .camera-controls {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin-top: 15px;
+            }
+            .camera-controls button {
+                padding: 10px 20px;
+                border-radius: 50px;
+                border: none;
+                cursor: pointer;
+                font-size: 16px;
+            }
+            #takePictureBtn {
+                background-color: #34A853;
+                color: white;
+            }
+            #closeCameraBtn {
+                background-color: #EA4335;
+                color: white;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Get elements and set up event handlers
+        const closeBtn = cameraModal.querySelector('.close-modal');
+        const closeCameraBtn = document.getElementById('closeCameraBtn');
+        const takePictureBtn = document.getElementById('takePictureBtn');
+        const video = document.getElementById('cameraPreview');
+        const canvas = document.getElementById('captureCanvas');
+        
+        // Close modal events
+        closeBtn.onclick = closeCameraBtn.onclick = function() {
+            stopVideoStream();
+            cameraModal.remove();
+        };
+        
+        // Initialize camera
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                })
+                .catch(function(error) {
+                    console.error("Camera error: ", error);
+                    alert("Unable to access camera. Please check permissions.");
+                    cameraModal.remove();
+                });
+        } else {
+            alert("Sorry, your browser doesn't support camera access");
+            cameraModal.remove();
+        }
+        
+        // Capture photo
+        takePictureBtn.onclick = function() {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert to file
+            canvas.toBlob(function(blob) {
+                const file = new File([blob], "camera-capture.jpg", { type: "image/jpeg" });
+                handleFiles([file]);
+                
+                // Close the modal
+                stopVideoStream();
+                cameraModal.remove();
+            }, 'image/jpeg');
+        };
+        
+        function stopVideoStream() {
+            if (video.srcObject) {
+                const tracks = video.srcObject.getTracks();
+                tracks.forEach(track => track.stop());
+                video.srcObject = null;
+            }
+        }
+    }
+}
+
+// Function to update history with images
+function updateHistory(elementId, items) {
+    const historyList = document.getElementById(elementId);
+    if (!historyList) return;
+
+    historyList.innerHTML = items.map(item => {
+        // Generate image previews if available
+        let imageHtml = '';
+        if (item.images && item.images.length) {
+            imageHtml = `
+                <div class="expense-images">
+                    ${item.images.slice(0, 3).map(img => {
+                        const url = img instanceof File ? URL.createObjectURL(img) : img;
+                        return `<img src="${url}" class="expense-thumbnail" alt="Receipt">`;
+                    }).join('')}
+                    ${item.images.length > 3 ? `<div class="more-images">+${item.images.length - 3}</div>` : ''}
+                </div>
+            `;
+        }
+
+        return `
+            <li>
+                <div class="expense-details">
+                    <span>${item.name}</span>
+                    <span>£${item.amount.toFixed(2)}</span>
+                    <span>${item.date}</span>
+                    ${item.description ? `<p>${item.description}</p>` : ''}
+                    ${imageHtml}
+                </div>
+            </li>
+        `;
+    }).join('');
 }

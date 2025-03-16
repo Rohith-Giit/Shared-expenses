@@ -104,17 +104,28 @@
         // Code Login
         codeForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const code = document.getElementById('uniqueCode').value;
+            const codeInput = document.getElementById('uniqueCode');
+            const code = codeInput.value.trim();
+            const loginButton = e.target.querySelector('button[type="submit"]');
+            
+            if (!code) {
+                showError('Please enter a code');
+                return;
+            }
             
             try {
-                const loginButton = e.target.querySelector('button');
                 loginButton.disabled = true;
                 loginButton.textContent = 'Verifying...';
                 
                 await loginWithCode(code);
-                window.location.href = 'index.html';
+                
+                // Show success message before redirecting
+                showSuccess('Login successful! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
             } catch (error) {
-                showError('Invalid code');
+                showError(error.message || 'Invalid code');
                 loginButton.disabled = false;
                 loginButton.textContent = 'Continue with Code';
             }
@@ -122,12 +133,26 @@
 
         // Generate New Code
         document.getElementById('generateCodeBtn').addEventListener('click', async () => {
+            const generateButton = document.getElementById('generateCodeBtn');
+            const codeInput = document.getElementById('uniqueCode');
+            
             try {
+                generateButton.disabled = true;
+                generateButton.textContent = 'Generating...';
+                
                 const code = await generateUniqueCode();
-                document.getElementById('uniqueCode').value = code;
-                showSuccess('New code generated! Save this code for future logins.');
+                codeInput.value = code;
+                
+                // Show success message with the code
+                showSuccess(`Your unique code: ${code}\nSave this code for future logins!`);
+                
+                // Enable the submit button
+                codeForm.querySelector('button[type="submit"]').disabled = false;
             } catch (error) {
                 showError('Failed to generate code');
+            } finally {
+                generateButton.disabled = false;
+                generateButton.textContent = 'Generate New Code';
             }
         });
 
