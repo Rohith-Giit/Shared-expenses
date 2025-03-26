@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NoteBudget</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <nav class="sidebar">
+      <div class="logo">
+        <span class="icon">💰</span>
+        <span>NoteBudget</span>
+      </div>
+      <div class="nav-items">
+        <button class="nav-item active" data-tab="dashboard">
+          <span class="icon">🏠</span>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-tab="wallet">
+          <span class="icon">👛</span>
+          <span>Wallet</span>
+        </button>
+        <button class="nav-item" data-tab="expenses">
+          <span class="icon">📊</span>
+          <span>Expenses</span>
+        </button>
+      </div>
+    </nav>
+
+    <main class="content">
+      <!-- Dashboard Tab -->
+      <div class="tab-content active" id="dashboard">
+        <h2>Overview</h2>
+        <div class="cards">
+          <div class="card">
+            <div class="card-header">
+              <span class="icon">💵</span>
+              <span class="label">Balance</span>
+            </div>
+            <div class="amount" id="totalBalance">£0.00</div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="icon">📈</span>
+              <span class="label">Income</span>
+            </div>
+            <div class="amount" id="totalIncome">£0.00</div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="icon">📉</span>
+              <span class="label">Expenses</span>
+            </div>
+            <div class="amount" id="totalExpenses">£0.00</div>
+          </div>
+        </div>
+
+        <div class="transactions-list">
+          <h3>Recent Transactions</h3>
+          <div id="recentTransactions"></div>
+        </div>
+      </div>
+
+      <!-- Wallet Tab -->
+      <div class="tab-content" id="wallet">
+        <h2>Wallet</h2>
+        <div class="actions">
+          <button class="btn primary" id="addMoneyBtn">
+            <span class="icon">➕</span> Add Money
+          </button>
+          <button class="btn secondary" id="sendMoneyBtn">
+            <span class="icon">➡️</span> Send Money
+          </button>
+        </div>
+      </div>
+
+      <!-- Expenses Tab -->
+      <div class="tab-content" id="expenses">
+        <h2>Expenses</h2>
+        <form id="expenseForm" class="form">
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" id="expenseDescription" required>
+          </div>
+          <div class="form-group">
+            <label>Amount (£)</label>
+            <input type="number" id="expenseAmount" min="0.01" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select id="expenseType">
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
+          <button type="submit" class="btn primary">Add Transaction</button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Money Modal -->
+  <div class="modal" id="addMoneyModal">
+    <div class="modal-content">
+      <h3>Add Money</h3>
+      <form id="addMoneyForm">
+        <div class="form-group">
+          <label>Amount (£)</label>
+          <input type="number" id="addAmount" min="0.01" step="0.01" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn secondary" onclick="closeModal('addMoneyModal')">Cancel</button>
+          <button type="submit" class="btn primary">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Send Money Modal -->
+  <div class="modal" id="sendMoneyModal">
+    <div class="modal-content">
+      <h3>Send Money</h3>
+      <form id="sendMoneyForm">
+        <div class="form-group">
+          <label>Recipient</label>
+          <input type="text" id="recipientName" required>
+        </div>
+        <div class="form-group">
+          <label>Amount (£)</label>
+          <input type="number" id="sendAmount" min="0.01" step="0.01" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn secondary" onclick="closeModal('sendMoneyModal')">Cancel</button>
+          <button type="submit" class="btn primary">Send</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
